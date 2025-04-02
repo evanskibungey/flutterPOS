@@ -21,6 +21,7 @@ class _POSSalesScreenState extends State<POSSalesScreen> with SingleTickerProvid
 
   // Page state
   bool _isLoading = true;
+  double _loadingProgress = 0.0;
   String? _errorMessage;
 
   // Products and categories
@@ -41,6 +42,9 @@ class _POSSalesScreenState extends State<POSSalesScreen> with SingleTickerProvid
   // Animation controller for product cards
   late AnimationController _animationController;
 
+  // Scroll controller for GridView
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -58,6 +62,7 @@ class _POSSalesScreenState extends State<POSSalesScreen> with SingleTickerProvid
   void dispose() {
     _searchController.dispose();
     _animationController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -66,6 +71,8 @@ class _POSSalesScreenState extends State<POSSalesScreen> with SingleTickerProvid
     setState(() {
       _isLoading = true;
       _errorMessage = null;
+      _allProducts = []; // Clear existing products
+      _loadingProgress = 0.0;
     });
 
     try {
@@ -73,16 +80,17 @@ class _POSSalesScreenState extends State<POSSalesScreen> with SingleTickerProvid
       final categoriesResult = await _categoryService.getCategories(
         status: 'active',
       );
-
-      // Load products with category filter if selected
-      final productsResult = await _productService.getProducts(
-        status: 'active',
-        categoryId: _selectedCategoryId, // Pass selected category to API
-      );
-
+      
+      // Set categories immediately
       setState(() {
         _categories = categoriesResult['categories'];
-        _allProducts = productsResult['products'];
+      });
+
+      // Load all pages of products
+      await _loadAllProducts();
+      
+      // Update state after loading all products
+      setState(() {
         _filteredProducts = _allProducts;
         _isLoading = false;
       });
@@ -104,6 +112,61 @@ class _POSSalesScreenState extends State<POSSalesScreen> with SingleTickerProvid
     }
   }
 
+  // Load all pages of products
+  Future<void> _loadAllProducts() async {
+    int currentPage = 1;
+    int lastPage = 1;
+    bool hasMorePages = true;
+    List<Product> allLoadedProducts = [];
+    
+    try {
+      while (hasMorePages) {
+        final productsResult = await _productService.getProducts(
+          status: 'active',
+          categoryId: _selectedCategoryId,
+          page: currentPage,
+          // Consider increasing the per_page parameter if supported by your API
+          // perPage: 50, // Uncomment if your API supports this
+        );
+        
+        // Add products from the current page
+        final pageProducts = productsResult['products'] as List<Product>;
+        allLoadedProducts.addAll(pageProducts);
+        
+        // Update pagination info
+        currentPage = productsResult['current_page'];
+        lastPage = productsResult['last_page'];
+        
+        // Check if we've reached the last page
+        hasMorePages = currentPage < lastPage;
+        
+        // Move to next page
+        currentPage++;
+        
+        // Update loading progress
+        setState(() {
+          _loadingProgress = currentPage / (lastPage + 1);
+          // Add partial results to allow incremental display
+          _allProducts = List.from(allLoadedProducts);
+          _filteredProducts = _allProducts;
+        });
+        
+        // Small delay to prevent API rate limiting if necessary
+        await Future.delayed(Duration(milliseconds: 100));
+      }
+    } catch (e) {
+      debugPrint('Error loading all products: $e');
+      // If there was an error, we'll still use whatever products we've loaded so far
+    }
+    
+    // Set the final complete result
+    setState(() {
+      _allProducts = allLoadedProducts;
+      _filteredProducts = _allProducts;
+      _loadingProgress = 1.0;
+    });
+  }
+
   // Filter products by search query only
   void _filterProducts() {
     setState(() {
@@ -111,13 +174,11 @@ class _POSSalesScreenState extends State<POSSalesScreen> with SingleTickerProvid
         _filteredProducts = _allProducts;
       } else {
         final query = _searchController.text.toLowerCase();
-        _filteredProducts =
-            _allProducts.where((product) {
-              return product.name.toLowerCase().contains(query) ||
-                  product.sku.toLowerCase().contains(query) ||
-                  (product.serialNumber?.toLowerCase().contains(query) ??
-                      false);
-            }).toList();
+        _filteredProducts = _allProducts.where((product) {
+          return product.name.toLowerCase().contains(query) ||
+              product.sku.toLowerCase().contains(query) ||
+              (product.serialNumber?.toLowerCase().contains(query) ?? false);
+        }).toList();
       }
     });
   }
@@ -207,16 +268,15 @@ class _POSSalesScreenState extends State<POSSalesScreen> with SingleTickerProvid
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder:
-            (context) => CartScreen(
-              cart: _cart,
-              onCartUpdated: (updatedCart) {
-                setState(() {
-                  _cart = updatedCart;
-                });
-              },
-              currencySymbol: _currencySymbol,
-            ),
+        builder: (context) => CartScreen(
+          cart: _cart,
+          onCartUpdated: (updatedCart) {
+            setState(() {
+              _cart = updatedCart;
+            });
+          },
+          currencySymbol: _currencySymbol,
+        ),
       ),
     );
   }
@@ -266,6 +326,451 @@ class _POSSalesScreenState extends State<POSSalesScreen> with SingleTickerProvid
             ),
           ),
       ],
+    );
+  }
+  
+  // Product card widget - extracted for better performance
+  Widget _buildProductCard(Product product, int index) {
+    final bool isOutOfStock = product.stock <= 0;
+    
+    // Create animation delay based on index
+    final delay = (index % 20) * 0.025; // Smaller delay for smoother loading
+    final animation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Interval(delay, delay + 0.4, curve: Curves.easeOut),
+      ),
+    );
+
+    // Use RepaintBoundary to optimize rendering
+    return RepaintBoundary(
+      child: FadeTransition(
+        opacity: animation,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: Offset(0, 0.1),
+            end: Offset.zero,
+          ).animate(animation),
+          child: Card(
+            elevation: 4,
+            shadowColor: Colors.black26,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: InkWell(
+              onTap: isOutOfStock ? null : () => _addToCart(product),
+              borderRadius: BorderRadius.circular(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Stock badge
+                  Stack(
+                    children: [
+                      // Image with rounded corners
+                      Container(
+                        height: 130,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
+                          color: Colors.white,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
+                          child: NetworkImageHelper(
+                            imageUrl: product.imageUrl,
+                            productName: product.name,
+                            fit: BoxFit.contain,
+                            height: double.infinity,
+                            width: double.infinity,
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(16),
+                            ),
+                            backgroundColor: Colors.white,
+                          ),
+                        ),
+                      ),
+                      
+                      // Out of stock overlay
+                      if (isOutOfStock)
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.5),
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(16),
+                              ),
+                            ),
+                            child: Center(
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade600,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  'OUT OF STOCK',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        
+                      // Stock indicator
+                      if (!isOutOfStock && product.stock < 5)
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.shade500,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              'Only ${product.stock} left',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+
+                  // Product details with improved spacing
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(12.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(
+                          bottom: Radius.circular(16),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Category badge
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              product.getCategoryName(),
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.grey.shade700,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          
+                          // Name with better typography
+                          Flexible(
+                            child: Text(
+                              product.name,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                                color: Colors.grey.shade800,
+                                height: 1.2,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          
+                          // Serial number if exists
+                          if (product.serialNumber != null && 
+                              product.serialNumber!.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Container(
+                                width: double.infinity,
+                                child: Text(
+                                  'SN: ${product.serialNumber}',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+
+                          // Price and add button with better alignment
+                          Row(
+                            children: [
+                              // Price with larger text
+                              Text(
+                                '${_currencySymbol} ${product.price.toStringAsFixed(2)}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: Colors.orange.shade700,
+                                ),
+                              ),
+                              Spacer(),
+                              // Enhanced add to cart button
+                              SizedBox(
+                                height: 36,
+                                width: 36,
+                                child: ElevatedButton(
+                                  onPressed: isOutOfStock
+                                      ? null
+                                      : () => _addToCart(product),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange.shade500,
+                                    foregroundColor: Colors.white,
+                                    disabledBackgroundColor: Colors.grey.shade300,
+                                    elevation: 4,
+                                    shadowColor: Colors.orange.shade200,
+                                    shape: CircleBorder(),
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                  child: Icon(
+                                    Icons.add_shopping_cart,
+                                    size: 18,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Empty products placeholder
+  Widget _buildEmptyProductsPlaceholder() {
+    return Center(
+      child: Container(
+        margin: EdgeInsets.all(24),
+        padding: EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.search_off,
+              size: 72,
+              color: Colors.grey.shade300,
+            ),
+            SizedBox(height: 24),
+            Text(
+              'No products found',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey.shade800,
+              ),
+            ),
+            SizedBox(height: 12),
+            Text(
+              'Try a different search term or category',
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                _searchController.clear();
+                setState(() {
+                  _selectedCategoryId = null;
+                });
+                _loadData(); // Reload data from API
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange.shade500,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              icon: Icon(Icons.refresh),
+              label: Text(
+                'Reset Filters',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Loading indicator with progress
+  Widget _buildLoadingIndicator() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              // Progress indicator showing loading progress
+              SizedBox(
+                height: 60,
+                width: 60,
+                child: CircularProgressIndicator(
+                  value: _loadingProgress > 0 ? _loadingProgress : null,
+                  color: Colors.orange.shade500,
+                  strokeWidth: 3,
+                ),
+              ),
+              // Show progress percentage in the center
+              if (_loadingProgress > 0)
+                Text(
+                  '${(_loadingProgress * 100).toInt()}%',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+            ],
+          ),
+          SizedBox(height: 16),
+          Text(
+            _loadingProgress > 0
+              ? 'Loading products (${_allProducts.length} loaded)...'
+              : 'Loading products...',
+            style: TextStyle(
+              color: Colors.orange.shade700,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Error state widget
+  Widget _buildErrorState() {
+    return Center(
+      child: Container(
+        margin: EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.red.shade400,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Error Loading Data',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.red.shade700,
+              ),
+            ),
+            SizedBox(height: 12),
+            Text(
+              _errorMessage!,
+              style: TextStyle(
+                color: Colors.grey.shade700,
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: _loadData,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange.shade500,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                elevation: 4,
+              ),
+              icon: Icon(Icons.refresh),
+              label: Text(
+                'Retry',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -345,95 +850,10 @@ class _POSSalesScreenState extends State<POSSalesScreen> with SingleTickerProvid
                 extendedPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               )
               : null,
-      body:
-          _isLoading
-              ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(
-                      color: Colors.orange.shade500,
-                      strokeWidth: 3,
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      'Loading products...',
-                      style: TextStyle(
-                        color: Colors.orange.shade700,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              )
-              : _errorMessage != null
-              ? Center(
-                child: Container(
-                  margin: EdgeInsets.all(24),
-                  padding: EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 10,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        size: 64,
-                        color: Colors.red.shade400,
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        'Error Loading Data',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red.shade700,
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      Text(
-                        _errorMessage!,
-                        style: TextStyle(
-                          color: Colors.grey.shade700,
-                          fontSize: 16,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 24),
-                      ElevatedButton.icon(
-                        onPressed: _loadData,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange.shade500,
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          elevation: 4,
-                        ),
-                        icon: Icon(Icons.refresh),
-                        label: Text(
-                          'Retry',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              )
+      body: _isLoading
+          ? _buildLoadingIndicator()
+          : _errorMessage != null
+              ? _buildErrorState()
               : Column(
                 children: [
                   // Search and filter container with subtle gradient background
@@ -664,358 +1084,44 @@ class _POSSalesScreenState extends State<POSSalesScreen> with SingleTickerProvid
 
                   // Products grid
                   Expanded(
-                    child:
-                        _filteredProducts.isEmpty
-                            ? Center(
-                              child: Container(
-                                margin: EdgeInsets.all(24),
-                                padding: EdgeInsets.all(32),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
-                                      blurRadius: 10,
-                                      offset: Offset(0, 5),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.search_off,
-                                      size: 72,
-                                      color: Colors.grey.shade300,
-                                    ),
-                                    SizedBox(height: 24),
-                                    Text(
-                                      'No products found',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.grey.shade800,
-                                      ),
-                                    ),
-                                    SizedBox(height: 12),
-                                    Text(
-                                      'Try a different search term or category',
-                                      style: TextStyle(
-                                        color: Colors.grey.shade600,
-                                        fontSize: 16,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    SizedBox(height: 24),
-                                    ElevatedButton.icon(
-                                      onPressed: () {
-                                        _searchController.clear();
-                                        setState(() {
-                                          _selectedCategoryId = null;
-                                        });
-                                        _loadData(); // Reload data from API
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.orange.shade500,
-                                        foregroundColor: Colors.white,
-                                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(30),
-                                        ),
-                                      ),
-                                      icon: Icon(Icons.refresh),
-                                      label: Text(
-                                        'Reset Filters',
-                                        style: TextStyle(fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                    child: _filteredProducts.isEmpty
+                        ? _buildEmptyProductsPlaceholder()
+                        : NotificationListener<ScrollNotification>(
+                            onNotification: (ScrollNotification scrollInfo) {
+                              // Delayed card loading when scrolling for better performance
+                              // Load more items as user scrolls
+                              if (scrollInfo is ScrollEndNotification) {
+                                // Check if animation controller has completed
+                                if (!_animationController.isAnimating && 
+                                    _animationController.isCompleted) {
+                                  // Reset for next animation
+                                  _animationController.reset();
+                                  _animationController.forward();
+                                }
+                              }
+                              return false;
+                            },
+                            child: GridView.builder(
+                              controller: _scrollController,
+                              padding: EdgeInsets.all(16),
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: MediaQuery.of(context).size.width > 800
+                                    ? 4
+                                    : MediaQuery.of(context).size.width > 600
+                                        ? 3
+                                        : 2,
+                                childAspectRatio: 0.62,
+                                crossAxisSpacing: 16,
+                                mainAxisSpacing: 16,
                               ),
-                            )
-                            : AnimatedBuilder(
-                                animation: _animationController,
-                                builder: (context, child) {
-                                  return GridView.builder(
-                                    padding: EdgeInsets.all(16),
-                                    gridDelegate:
-                                        SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount:
-                                              MediaQuery.of(context).size.width > 800
-                                                  ? 4
-                                                  : MediaQuery.of(
-                                                        context,
-                                                      ).size.width >
-                                                      600
-                                                  ? 3
-                                                  : 2,
-                                          childAspectRatio: 0.62,
-                                          crossAxisSpacing: 16,
-                                          mainAxisSpacing: 16,
-                                        ),
-                                    itemCount: _filteredProducts.length,
-                                    itemBuilder: (context, index) {
-                                      final product = _filteredProducts[index];
-                                      final bool isOutOfStock = product.stock <= 0;
-                                      
-                                      // Apply staggered animation
-                                      final delay = (index % 10) * 0.05;
-                                      final animation = Tween<double>(begin: 0.0, end: 1.0).animate(
-                                        CurvedAnimation(
-                                          parent: _animationController,
-                                          curve: Interval(
-                                            delay, 
-                                            delay + 0.5,
-                                            curve: Curves.easeOut,
-                                          ),
-                                        ),
-                                      );
-
-                                      // Enhanced product card with shadow and animation
-                                      return FadeTransition(
-                                        opacity: animation,
-                                        child: SlideTransition(
-                                          position: Tween<Offset>(
-                                            begin: Offset(0, 0.2),
-                                            end: Offset.zero,
-                                          ).animate(animation),
-                                          child: Card(
-                                            elevation: 4,
-                                            shadowColor: Colors.black26,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(16),
-                                            ),
-                                            child: InkWell(
-                                              onTap: isOutOfStock ? null : () => _addToCart(product),
-                                              borderRadius: BorderRadius.circular(16),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                children: [
-                                                  // Stock badge
-                                                  Stack(
-                                                    children: [
-                                                      // Image with rounded corners
-                                                      Container(
-                                                        height: 130,
-                                                        decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.vertical(
-                                                            top: Radius.circular(16),
-                                                          ),
-                                                          color: Colors.white,
-                                                        ),
-                                                        child: ClipRRect(
-                                                          borderRadius: BorderRadius.vertical(
-                                                            top: Radius.circular(16),
-                                                          ),
-                                                          child: NetworkImageHelper(
-                                                            imageUrl: product.imageUrl,
-                                                            productName: product.name,
-                                                            fit: BoxFit.contain,
-                                                            height: double.infinity,
-                                                            width: double.infinity,
-                                                            borderRadius: BorderRadius.vertical(
-                                                              top: Radius.circular(16),
-                                                            ),
-                                                            backgroundColor: Colors.white,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      
-                                                      // Out of stock overlay
-                                                      if (isOutOfStock)
-                                                        Positioned(
-                                                          top: 0,
-                                                          left: 0,
-                                                          right: 0,
-                                                          bottom: 0,
-                                                          child: Container(
-                                                            decoration: BoxDecoration(
-                                                              color: Colors.black.withOpacity(0.5),
-                                                              borderRadius: BorderRadius.vertical(
-                                                                top: Radius.circular(16),
-                                                              ),
-                                                            ),
-                                                            child: Center(
-                                                              child: Container(
-                                                                padding: EdgeInsets.symmetric(
-                                                                  horizontal: 12,
-                                                                  vertical: 6,
-                                                                ),
-                                                                decoration: BoxDecoration(
-                                                                  color: Colors.red.shade600,
-                                                                  borderRadius: BorderRadius.circular(20),
-                                                                ),
-                                                                child: Text(
-                                                                  'OUT OF STOCK',
-                                                                  style: TextStyle(
-                                                                    color: Colors.white,
-                                                                    fontWeight: FontWeight.bold,
-                                                                    fontSize: 12,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        
-                                                      // Stock indicator
-                                                      if (!isOutOfStock && product.stock < 5)
-                                                        Positioned(
-                                                          top: 8,
-                                                          right: 8,
-                                                          child: Container(
-                                                            padding: EdgeInsets.symmetric(
-                                                              horizontal: 8,
-                                                              vertical: 4,
-                                                            ),
-                                                            decoration: BoxDecoration(
-                                                              color: Colors.orange.shade500,
-                                                              borderRadius: BorderRadius.circular(12),
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                  color: Colors.black26,
-                                                                  blurRadius: 2,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            child: Text(
-                                                              'Only ${product.stock} left',
-                                                              style: TextStyle(
-                                                                color: Colors.white,
-                                                                fontWeight: FontWeight.bold,
-                                                                fontSize: 10,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                    ],
-                                                  ),
-
-                                                  // Product details with improved spacing
-                                                  Expanded(
-                                                    child: Container(
-                                                      padding: const EdgeInsets.all(12.0),
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius: BorderRadius.vertical(
-                                                          bottom: Radius.circular(16),
-                                                        ),
-                                                      ),
-                                                      child: Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        mainAxisSize: MainAxisSize.min,
-                                                        children: [
-                                                          // Category badge
-                                                          Container(
-                                                            padding: EdgeInsets.symmetric(
-                                                              horizontal: 8,
-                                                              vertical: 2,
-                                                            ),
-                                                            decoration: BoxDecoration(
-                                                              color: Colors.grey.shade100,
-                                                              borderRadius: BorderRadius.circular(4),
-                                                            ),
-                                                            child: Text(
-                                                              product.getCategoryName(),
-                                                              style: TextStyle(
-                                                                fontSize: 10,
-                                                                color: Colors.grey.shade700,
-                                                              ),
-                                                              maxLines: 1,
-                                                              overflow: TextOverflow.ellipsis,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 8),
-                                                          
-                                                          // Name with better typography
-                                                          Flexible(
-                                                            child: Text(
-                                                              product.name,
-                                                              style: TextStyle(
-                                                                fontWeight: FontWeight.bold,
-                                                                fontSize: 15,
-                                                                color: Colors.grey.shade800,
-                                                                height: 1.2,
-                                                              ),
-                                                              maxLines: 2,
-                                                              overflow: TextOverflow.ellipsis,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 8),
-                                                          
-                                                          // Serial number if exists
-                                                          if (product.serialNumber != null && 
-                                                              product.serialNumber!.isNotEmpty)
-                                                            Padding(
-                                                              padding: const EdgeInsets.only(bottom: 8.0),
-                                                              child: Container(
-                                                                width: double.infinity,
-                                                                child: Text(
-                                                                  'SN: ${product.serialNumber}',
-                                                                  style: TextStyle(
-                                                                    fontSize: 10,
-                                                                    color: Colors.grey.shade600,
-                                                                  ),
-                                                                  maxLines: 1,
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                ),
-                                                              ),
-                                                            ),
-
-                                                          // Price and add button with better alignment
-                                                          Row(
-                                                            children: [
-                                                              // Price with larger text
-                                                              Text(
-                                                                '${_currencySymbol} ${product.price.toStringAsFixed(2)}',
-                                                                style: TextStyle(
-                                                                  fontWeight: FontWeight.bold,
-                                                                  fontSize: 18,
-                                                                  color: Colors.orange.shade700,
-                                                                ),
-                                                              ),
-                                                              Spacer(),
-                                                              // Enhanced add to cart button
-                                                              SizedBox(
-                                                                height: 36,
-                                                                width: 36,
-                                                                child: ElevatedButton(
-                                                                  onPressed: isOutOfStock
-                                                                      ? null
-                                                                      : () => _addToCart(product),
-                                                                  style: ElevatedButton.styleFrom(
-                                                                    backgroundColor: Colors.orange.shade500,
-                                                                    foregroundColor: Colors.white,
-                                                                    disabledBackgroundColor: Colors.grey.shade300,
-                                                                    elevation: 4,
-                                                                    shadowColor: Colors.orange.shade200,
-                                                                    shape: CircleBorder(),
-                                                                    padding: EdgeInsets.zero,
-                                                                  ),
-                                                                  child: Icon(
-                                                                    Icons.add_shopping_cart,
-                                                                    size: 18,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
+                              itemCount: _filteredProducts.length,
+                              cacheExtent: 500, // Increase cache to reduce rebuilds
+                              itemBuilder: (context, index) {
+                                final product = _filteredProducts[index];
+                                return _buildProductCard(product, index);
+                              },
+                            ),
+                          ),
                   ),
                 ],
               ),
