@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/category_service.dart';
 import '../../models/category.dart';
+import '../../theme/app_theme.dart'; // Import the AppTheme
 
 class CategoryFormScreen extends StatefulWidget {
   final Category? category; // Null for create, non-null for edit
@@ -66,7 +67,11 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
         // Show success message and return to list
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Category updated successfully')),
+            SnackBar(
+              content: Text('Category updated successfully'),
+              backgroundColor: AppColors.successColor,
+              behavior: SnackBarBehavior.floating,
+            ),
           );
           Navigator.pop(context);
         }
@@ -81,7 +86,11 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
         // Show success message and return to list
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Category created successfully')),
+            SnackBar(
+              content: Text('Category created successfully'),
+              backgroundColor: AppColors.successColor,
+              behavior: SnackBarBehavior.floating,
+            ),
           );
           Navigator.pop(context);
         }
@@ -97,9 +106,16 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        title: Text(_isEditMode ? 'Edit Category' : 'Add Category'),
-        backgroundColor: Colors.orange.shade500,
+        title: Text(
+          _isEditMode ? 'Edit Category' : 'Add Category',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: AppColors.primaryColor,
       ),
       body: Form(
         key: _formKey,
@@ -112,13 +128,13 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
                 padding: const EdgeInsets.all(12),
                 margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
-                  color: Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.red.shade200),
+                  color: AppColors.errorColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.errorColor.withOpacity(0.3)),
                 ),
                 child: Text(
                   _errorMessage!,
-                  style: TextStyle(color: Colors.red.shade800),
+                  style: TextStyle(color: AppColors.errorColor),
                 ),
               ),
             
@@ -131,7 +147,11 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                prefixIcon: const Icon(Icons.category),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                ),
+                prefixIcon: Icon(Icons.category, color: AppColors.primaryColor),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -151,7 +171,11 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                prefixIcon: const Icon(Icons.description),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                ),
+                prefixIcon: Icon(Icons.description, color: AppColors.primaryColor),
               ),
               maxLines: 3,
             ),
@@ -161,12 +185,9 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Status',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTheme.sectionTitle.copyWith(fontSize: 16),
                 ),
                 const SizedBox(height: 8),
                 Row(
@@ -182,7 +203,7 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
                             _status = value!;
                           });
                         },
-                        activeColor: Colors.green,
+                        activeColor: AppColors.successColor,
                       ),
                     ),
                     
@@ -197,7 +218,7 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
                             _status = value!;
                           });
                         },
-                        activeColor: Colors.red,
+                        activeColor: AppColors.errorColor,
                       ),
                     ),
                   ],
@@ -210,14 +231,20 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
             ElevatedButton(
               onPressed: _isLoading ? null : _saveCategory,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange.shade500,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
               child: _isLoading
-                  ? const CircularProgressIndicator(color: Colors.white)
+                  ? SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
                   : Text(
                       _isEditMode ? 'Update Category' : 'Create Category',
                       style: const TextStyle(

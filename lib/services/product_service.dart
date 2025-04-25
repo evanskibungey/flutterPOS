@@ -624,7 +624,15 @@ class ProductService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return Product.fromJson(data['product']);
+        debugPrint('Stock update response: ${data.toString()}');
+        
+        // Make sure we have the product data in the response
+        if (data['product'] != null) {
+          return Product.fromJson(data['product']);
+        } else {
+          // If for some reason we don't have the product data, fetch the product again
+          return await getProduct(id);
+        }
       } else {
         // Log the error response
         ApiConfig.logApiResponse(

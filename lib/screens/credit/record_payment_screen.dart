@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../models/customer.dart';
 import '../../services/credit_service.dart';
 import '../../utils/format_utils.dart';
+import '../../theme/app_theme.dart'; // Import the AppTheme
 
 class RecordPaymentScreen extends StatefulWidget {
   final Customer customer;
@@ -69,7 +70,8 @@ class _RecordPaymentScreenState extends State<RecordPaymentScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Payment of KSh ${formatCurrency(amount)} recorded successfully'),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.successColor,
+          behavior: SnackBarBehavior.floating,
         ),
       );
       
@@ -83,7 +85,8 @@ class _RecordPaymentScreenState extends State<RecordPaymentScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: $_error'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.errorColor,
+          behavior: SnackBarBehavior.floating,
         ),
       );
     }
@@ -92,8 +95,16 @@ class _RecordPaymentScreenState extends State<RecordPaymentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        title: const Text('Record Payment'),
+        title: const Text(
+          'Record Payment',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: AppColors.primaryColor,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -104,7 +115,11 @@ class _RecordPaymentScreenState extends State<RecordPaymentScreen> {
             children: [
               // Customer Summary Card
               Card(
-                elevation: 4,
+                elevation: 2,
+                shadowColor: AppColors.shadowColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -113,13 +128,13 @@ class _RecordPaymentScreenState extends State<RecordPaymentScreen> {
                       Row(
                         children: [
                           CircleAvatar(
-                            backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                            backgroundColor: AppColors.primaryColor.withOpacity(0.1),
                             radius: 20,
                             child: Text(
                               widget.customer.name.substring(0, 1).toUpperCase(),
                               style: TextStyle(
                                 fontSize: 20,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: AppColors.primaryColor,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -131,37 +146,34 @@ class _RecordPaymentScreenState extends State<RecordPaymentScreen> {
                               children: [
                                 Text(
                                   widget.customer.name,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: AppTheme.cardTitle,
                                 ),
                                 Text(
                                   widget.customer.phone,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
-                                  ),
+                                  style: AppTheme.cardSubtitle,
                                 ),
                               ],
                             ),
                           ),
                         ],
                       ),
-                      const Divider(height: 24),
+                      Divider(height: 24, color: AppColors.dividerColor),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'Outstanding Balance:',
-                            style: TextStyle(fontWeight: FontWeight.w500),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.textPrimaryColor,
+                            ),
                           ),
                           Text(
                             'KSh ${formatCurrency(widget.customer.balance)}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFFD35400),
+                              color: AppColors.primaryColor,
                             ),
                           ),
                         ],
@@ -172,22 +184,26 @@ class _RecordPaymentScreenState extends State<RecordPaymentScreen> {
               ),
               
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'Payment Details',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: AppTheme.sectionTitle,
               ),
               const SizedBox(height: 16),
               
               // Amount
               TextFormField(
                 controller: _amountController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Amount',
+                  labelStyle: TextStyle(color: AppColors.textSecondaryColor),
                   prefixText: 'KSh ',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                  ),
                 ),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [
@@ -214,11 +230,12 @@ class _RecordPaymentScreenState extends State<RecordPaymentScreen> {
               const SizedBox(height: 16),
               
               // Payment Method
-              const Text(
+              Text(
                 'Payment Method',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimaryColor,
                 ),
               ),
               const SizedBox(height: 8),
@@ -243,10 +260,18 @@ class _RecordPaymentScreenState extends State<RecordPaymentScreen> {
               // Reference Number
               TextFormField(
                 controller: _referenceController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Reference Number (Optional)',
-                  border: OutlineInputBorder(),
+                  labelStyle: TextStyle(color: AppColors.textSecondaryColor),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                  ),
                   hintText: 'e.g., M-Pesa code or bank reference',
+                  hintStyle: TextStyle(color: AppColors.textTertiaryColor),
                 ),
                 validator: (value) {
                   if (_paymentMethod != 'cash' && (value == null || value.isEmpty)) {
@@ -261,10 +286,18 @@ class _RecordPaymentScreenState extends State<RecordPaymentScreen> {
               // Notes
               TextFormField(
                 controller: _notesController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Notes (Optional)',
-                  border: OutlineInputBorder(),
+                  labelStyle: TextStyle(color: AppColors.textSecondaryColor),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                  ),
                   hintText: 'Any additional information about this payment',
+                  hintStyle: TextStyle(color: AppColors.textTertiaryColor),
                 ),
                 maxLines: 3,
               ),
@@ -277,6 +310,14 @@ class _RecordPaymentScreenState extends State<RecordPaymentScreen> {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: _isProcessing ? null : _submitPayment,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.secondaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    disabledBackgroundColor: Colors.grey.shade300,
+                  ),
                   child: _isProcessing
                       ? const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -293,7 +334,13 @@ class _RecordPaymentScreenState extends State<RecordPaymentScreen> {
                             Text('Processing...'),
                           ],
                         )
-                      : const Text('Record Payment'),
+                      : const Text(
+                          'Record Payment',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
               
@@ -302,17 +349,18 @@ class _RecordPaymentScreenState extends State<RecordPaymentScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    color: AppColors.errorColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.errorColor.withOpacity(0.3)),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.error_outline, color: Colors.red),
+                      Icon(Icons.error_outline, color: AppColors.errorColor),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           _error!,
-                          style: const TextStyle(color: Colors.red),
+                          style: TextStyle(color: AppColors.errorColor),
                         ),
                       ),
                     ],
@@ -327,26 +375,42 @@ class _RecordPaymentScreenState extends State<RecordPaymentScreen> {
   }
 
   Widget _buildPaymentMethodOption(String value, String label) {
+    final isSelected = _paymentMethod == value;
+    
     return InkWell(
       onTap: () {
         setState(() {
           _paymentMethod = value;
         });
       },
+      borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: _paymentMethod == value
-              ? Theme.of(context).colorScheme.primary
-              : Colors.grey[200],
+          color: isSelected
+              ? AppColors.primaryColor
+              : Colors.grey.shade200,
           borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? AppColors.primaryColor : Colors.transparent,
+            width: 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppColors.shadowColor,
+                    blurRadius: 2,
+                    offset: Offset(0, 1),
+                  ),
+                ]
+              : null,
         ),
         child: Center(
           child: Text(
             label,
             style: TextStyle(
               fontWeight: FontWeight.w500,
-              color: _paymentMethod == value ? Colors.white : Colors.black87,
+              color: isSelected ? Colors.white : AppColors.textPrimaryColor,
             ),
           ),
         ),

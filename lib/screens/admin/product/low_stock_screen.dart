@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pos_app/models/product.dart';
 import 'package:pos_app/services/product_service.dart';
+import 'package:pos_app/theme/app_theme.dart'; // Import the AppTheme
 
 class LowStockScreen extends StatefulWidget {
   final String currencySymbol;
@@ -61,25 +62,49 @@ class _LowStockScreenState extends State<LowStockScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Product: ${product.name}'),
+            Text(
+              'Product: ${product.name}',
+              style: TextStyle(
+                color: AppColors.textPrimaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text('Current stock: ${product.stock}'),
-            Text('Minimum stock: ${product.minStock}'),
+            Text(
+              'Current stock: ${product.stock}',
+              style: TextStyle(color: AppColors.textSecondaryColor),
+            ),
+            Text(
+              'Minimum stock: ${product.minStock}',
+              style: TextStyle(color: AppColors.textSecondaryColor),
+            ),
             const SizedBox(height: 16),
             TextField(
               controller: stockController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'New Stock',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                ),
               ),
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 16),
             TextField(
               controller: notesController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Notes (optional)',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                ),
               ),
               maxLines: 2,
             ),
@@ -88,16 +113,26 @@ class _LowStockScreenState extends State<LowStockScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(null),
-            child: const Text('CANCEL'),
+            child: Text(
+              'CANCEL',
+              style: TextStyle(color: AppColors.textSecondaryColor),
+            ),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () => Navigator.of(context).pop({
               'stock': int.tryParse(stockController.text) ?? product.stock,
               'notes': notesController.text,
             }),
             child: const Text('UPDATE'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.secondaryColor,
+              foregroundColor: Colors.white,
+            ),
           ),
         ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
       ),
     );
 
@@ -112,9 +147,10 @@ class _LowStockScreenState extends State<LowStockScreen> {
         
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Stock updated successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.successColor,
+            behavior: SnackBarBehavior.floating,
           ),
         );
         
@@ -125,7 +161,8 @@ class _LowStockScreenState extends State<LowStockScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString()),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.errorColor,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -135,9 +172,16 @@ class _LowStockScreenState extends State<LowStockScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        title: const Text('Low Stock Products'),
-        backgroundColor: Colors.orange.shade500,
+        title: const Text(
+          'Low Stock Products',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: AppColors.primaryColor,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -147,32 +191,66 @@ class _LowStockScreenState extends State<LowStockScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator(color: AppColors.primaryColor))
           : _errorMessage != null
-              ? Center(child: Text(_errorMessage!))
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: AppColors.errorColor,
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Error',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.errorColor,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          _errorMessage!,
+                          style: TextStyle(
+                            color: AppColors.textSecondaryColor,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 24),
+                        ElevatedButton.icon(
+                          onPressed: _loadLowStockProducts,
+                          icon: Icon(Icons.refresh),
+                          label: Text('Try Again'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
               : _lowStockProducts.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
                             Icons.check_circle_outline,
                             size: 80,
-                            color: Colors.green,
+                            color: AppColors.successColor,
                           ),
                           SizedBox(height: 16),
                           Text(
                             'No low stock products',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: AppTheme.sectionTitle,
                           ),
                           SizedBox(height: 8),
                           Text(
                             'All products have sufficient stock levels',
                             style: TextStyle(
-                              color: Colors.grey,
+                              color: AppColors.textSecondaryColor,
                             ),
                           ),
                         ],
@@ -189,10 +267,7 @@ class _LowStockScreenState extends State<LowStockScreen> {
                             children: [
                               Text(
                                 '${_lowStockProducts.length} products need restock',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: AppTheme.sectionTitle,
                               ),
                               Container(
                                 padding: const EdgeInsets.symmetric(
@@ -200,7 +275,7 @@ class _LowStockScreenState extends State<LowStockScreen> {
                                   vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.red.shade100,
+                                  color: AppColors.errorColor.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Row(
@@ -208,13 +283,13 @@ class _LowStockScreenState extends State<LowStockScreen> {
                                     Icon(
                                       Icons.warning_amber_rounded,
                                       size: 18,
-                                      color: Colors.red.shade800,
+                                      color: AppColors.errorColor,
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
                                       'Low Stock Alert',
                                       style: TextStyle(
-                                        color: Colors.red.shade800,
+                                        color: AppColors.errorColor,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -229,6 +304,7 @@ class _LowStockScreenState extends State<LowStockScreen> {
                         Expanded(
                           child: RefreshIndicator(
                             onRefresh: _loadLowStockProducts,
+                            color: AppColors.primaryColor,
                             child: ListView.builder(
                               itemCount: _lowStockProducts.length,
                               itemBuilder: (context, index) {
@@ -243,12 +319,14 @@ class _LowStockScreenState extends State<LowStockScreen> {
                                     vertical: 8,
                                   ),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(16),
                                     side: BorderSide(
-                                      color: Colors.red.shade300,
+                                      color: AppColors.errorColor.withOpacity(0.3),
                                       width: 1,
                                     ),
                                   ),
+                                  elevation: 2,
+                                  shadowColor: AppColors.shadowColor,
                                   child: Padding(
                                     padding: const EdgeInsets.all(16.0),
                                     child: Column(
@@ -271,11 +349,17 @@ class _LowStockScreenState extends State<LowStockScreen> {
                                                         product.image!,
                                                         fit: BoxFit.cover,
                                                         errorBuilder: (context, error, stackTrace) {
-                                                          return const Icon(Icons.inventory_2_outlined);
+                                                          return Icon(
+                                                            Icons.inventory_2_outlined,
+                                                            color: AppColors.textSecondaryColor,
+                                                          );
                                                         },
                                                       ),
                                                     )
-                                                  : const Icon(Icons.inventory_2_outlined),
+                                                  : Icon(
+                                                      Icons.inventory_2_outlined,
+                                                      color: AppColors.textSecondaryColor,
+                                                    ),
                                             ),
                                             const SizedBox(width: 16),
                                             
@@ -286,23 +370,18 @@ class _LowStockScreenState extends State<LowStockScreen> {
                                                 children: [
                                                   Text(
                                                     product.name,
-                                                    style: const TextStyle(
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 16,
-                                                    ),
+                                                    style: AppTheme.cardTitle,
                                                   ),
                                                   Text(
                                                     categoryName,
-                                                    style: TextStyle(
-                                                      color: Colors.grey.shade600,
-                                                    ),
+                                                    style: AppTheme.cardSubtitle,
                                                   ),
                                                   const SizedBox(height: 4),
                                                   Text(
                                                     'SKU: ${product.sku}',
                                                     style: TextStyle(
                                                       fontSize: 12,
-                                                      color: Colors.grey.shade700,
+                                                      color: AppColors.textSecondaryColor,
                                                     ),
                                                   ),
                                                 ],
@@ -315,7 +394,7 @@ class _LowStockScreenState extends State<LowStockScreen> {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 16,
-                                                color: Colors.blue.shade800,
+                                                color: AppColors.primaryColor,
                                               ),
                                             ),
                                           ],
@@ -334,27 +413,35 @@ class _LowStockScreenState extends State<LowStockScreen> {
                                                     children: [
                                                       Text(
                                                         'Current Stock: ${product.stock}',
-                                                        style: const TextStyle(
+                                                        style: TextStyle(
                                                           fontWeight: FontWeight.bold,
+                                                          color: AppColors.textPrimaryColor,
                                                         ),
                                                       ),
                                                       Text(
                                                         'Min Stock: ${product.minStock}',
                                                         style: TextStyle(
-                                                          color: Colors.grey.shade700,
+                                                          color: AppColors.textSecondaryColor,
                                                         ),
                                                       ),
                                                     ],
                                                   ),
                                                   const SizedBox(height: 8),
-                                                  LinearProgressIndicator(
-                                                    value: product.minStock > 0
-                                                        ? (product.stock / product.minStock).clamp(0.0, 1.0)
-                                                        : 0,
-                                                    backgroundColor: Colors.grey.shade300,
-                                                    color: _getStockStatusColor(product),
-                                                    minHeight: 8,
-                                                    borderRadius: BorderRadius.circular(4),
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(4),
+                                                    ),
+                                                    child: ClipRRect(
+                                                      borderRadius: BorderRadius.circular(4),
+                                                      child: LinearProgressIndicator(
+                                                        value: product.minStock > 0
+                                                            ? (product.stock / product.minStock).clamp(0.0, 1.0)
+                                                            : 0,
+                                                        backgroundColor: Colors.grey.shade300,
+                                                        color: AppColors.getStockStatusColor(product.stock, product.minStock),
+                                                        minHeight: 8,
+                                                      ),
+                                                    ),
                                                   ),
                                                 ],
                                               ),
@@ -370,10 +457,6 @@ class _LowStockScreenState extends State<LowStockScreen> {
                                             onPressed: () => _updateStock(product),
                                             icon: const Icon(Icons.add_shopping_cart),
                                             label: const Text('Restock Now'),
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.orange.shade500,
-                                              foregroundColor: Colors.white,
-                                            ),
                                           ),
                                         ),
                                       ],
@@ -387,16 +470,5 @@ class _LowStockScreenState extends State<LowStockScreen> {
                       ],
                     ),
     );
-  }
-  
-  // Helper method to get color based on stock level
-  Color _getStockStatusColor(Product product) {
-    if (product.stock == 0) {
-      return Colors.red;
-    } else if (product.stock <= product.minStock * 0.5) {
-      return Colors.orange;
-    } else {
-      return Colors.yellow.shade700;
-    }
   }
 }

@@ -3,6 +3,7 @@ import '../../services/auth_service.dart';
 import '../../services/dashboard_service.dart';
 import '../../models/dashboard_models.dart';
 import '../../screens/login_screen.dart';
+import '../../theme/app_theme.dart'; // Import the AppTheme
 
 class CashierDashboard extends StatefulWidget {
   const CashierDashboard({Key? key}) : super(key: key);
@@ -54,9 +55,16 @@ class _CashierDashboardState extends State<CashierDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        title: const Text('Cashier Dashboard'),
-        backgroundColor: Colors.orange.shade500,
+        title: const Text(
+          'Cashier Dashboard',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: AppColors.primaryColor,
         actions: [
           IconButton(
             icon: const Icon(Icons.exit_to_app),
@@ -66,15 +74,52 @@ class _CashierDashboardState extends State<CashierDashboard> {
       ),
       drawer: _buildDrawer(),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator(color: AppColors.primaryColor))
           : _errorMessage != null
-              ? Center(child: Text(_errorMessage!))
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: AppColors.errorColor,
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        'Error',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.errorColor,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                        child: Text(
+                          _errorMessage!,
+                          style: TextStyle(
+                            color: AppColors.textSecondaryColor,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: _loadDashboardData,
+                        icon: Icon(Icons.refresh),
+                        label: Text('Refresh'),
+                      ),
+                    ],
+                  ),
+                )
               : _buildDashboardContent(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           // Navigate to new sale screen
         },
-        backgroundColor: Colors.orange.shade500,
+        backgroundColor: AppColors.secondaryColor,
         icon: const Icon(Icons.add_shopping_cart),
         label: const Text('New Sale'),
       ),
@@ -88,9 +133,9 @@ class _CashierDashboardState extends State<CashierDashboard> {
         children: [
           DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.orange.shade500,
+              color: AppColors.primaryColor,
             ),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CircleAvatar(
@@ -99,7 +144,7 @@ class _CashierDashboardState extends State<CashierDashboard> {
                   child: Icon(
                     Icons.person,
                     size: 40,
-                    color: Colors.orangeAccent,
+                    color: AppColors.secondaryColor,
                   ),
                 ),
                 SizedBox(height: 10),
@@ -108,55 +153,75 @@ class _CashierDashboardState extends State<CashierDashboard> {
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.dashboard),
-            title: const Text('Dashboard'),
+            leading: Icon(Icons.dashboard, color: AppColors.primaryColor),
+            title: Text(
+              'Dashboard',
+              style: TextStyle(color: AppColors.textPrimaryColor),
+            ),
             selected: true,
+            selectedTileColor: AppColors.primaryColor.withOpacity(0.1),
             onTap: () {
               Navigator.pop(context);
             },
           ),
           ListTile(
-            leading: const Icon(Icons.point_of_sale),
-            title: const Text('New Sale'),
+            leading: Icon(Icons.point_of_sale, color: AppColors.primaryColor),
+            title: Text(
+              'New Sale',
+              style: TextStyle(color: AppColors.textPrimaryColor),
+            ),
             onTap: () {
               Navigator.pop(context);
               // Navigate to new sale screen
             },
           ),
           ListTile(
-            leading: const Icon(Icons.receipt_long),
-            title: const Text('Sales History'),
+            leading: Icon(Icons.receipt_long, color: AppColors.primaryColor),
+            title: Text(
+              'Sales History',
+              style: TextStyle(color: AppColors.textPrimaryColor),
+            ),
             onTap: () {
               Navigator.pop(context);
               // Navigate to sales history screen
             },
           ),
           ListTile(
-            leading: const Icon(Icons.inventory),
-            title: const Text('Products'),
+            leading: Icon(Icons.inventory, color: AppColors.primaryColor),
+            title: Text(
+              'Products',
+              style: TextStyle(color: AppColors.textPrimaryColor),
+            ),
             onTap: () {
               Navigator.pop(context);
               // Navigate to products screen
             },
           ),
-          const Divider(),
+          Divider(color: AppColors.dividerColor),
           ListTile(
-            leading: const Icon(Icons.settings),
-            title: const Text('Settings'),
+            leading: Icon(Icons.settings, color: AppColors.primaryColor),
+            title: Text(
+              'Settings',
+              style: TextStyle(color: AppColors.textPrimaryColor),
+            ),
             onTap: () {
               Navigator.pop(context);
               // Navigate to settings
             },
           ),
           ListTile(
-            leading: const Icon(Icons.logout),
-            title: const Text('Logout'),
+            leading: Icon(Icons.logout, color: AppColors.errorColor),
+            title: Text(
+              'Logout',
+              style: TextStyle(color: AppColors.textPrimaryColor),
+            ),
             onTap: _logout,
           ),
         ],
@@ -166,25 +231,46 @@ class _CashierDashboardState extends State<CashierDashboard> {
 
   Widget _buildDashboardContent() {
     if (_dashboardData == null) {
-      return const Center(child: Text('No data available'));
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.analytics_outlined,
+              size: 80,
+              color: AppColors.textTertiaryColor,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'No data available',
+              style: AppTheme.sectionTitle,
+            ),
+            SizedBox(height: 8),
+            Text(
+              'There is no dashboard data to display',
+              style: TextStyle(
+                color: AppColors.textSecondaryColor,
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
     final currencySymbol = _dashboardData!.settings['currency_symbol'];
 
     return RefreshIndicator(
       onRefresh: _loadDashboardData,
+      color: AppColors.primaryColor,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Today\'s Summary',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: AppTheme.pageTitle,
             ),
             const SizedBox(height: 24),
             
@@ -196,7 +282,7 @@ class _CashierDashboardState extends State<CashierDashboard> {
                     title: 'Sales Today',
                     value: _dashboardData!.todaySalesCount.toString(),
                     icon: Icons.receipt,
-                    color: Colors.green,
+                    color: AppColors.successColor,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -205,7 +291,7 @@ class _CashierDashboardState extends State<CashierDashboard> {
                     title: 'Revenue',
                     value: '$currencySymbol ${_dashboardData!.todayRevenue.toStringAsFixed(2)}',
                     icon: Icons.attach_money,
-                    color: Colors.blue,
+                    color: AppColors.infoColor,
                   ),
                 ),
               ],
@@ -220,12 +306,9 @@ class _CashierDashboardState extends State<CashierDashboard> {
             const SizedBox(height: 24),
             
             // Quick actions
-            const Text(
+            Text(
               'Quick Actions',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: AppTheme.sectionTitle,
             ),
             const SizedBox(height: 16),
             
@@ -239,7 +322,7 @@ class _CashierDashboardState extends State<CashierDashboard> {
                 _buildActionCard(
                   title: 'New Sale',
                   icon: Icons.add_shopping_cart,
-                  color: Colors.orange,
+                  color: AppColors.primaryColor,
                   onTap: () {
                     // Navigate to new sale
                   },
@@ -247,7 +330,7 @@ class _CashierDashboardState extends State<CashierDashboard> {
                 _buildActionCard(
                   title: 'View Products',
                   icon: Icons.search,
-                  color: Colors.purple,
+                  color: AppColors.secondaryColor,
                   onTap: () {
                     // Navigate to products
                   },
@@ -255,7 +338,7 @@ class _CashierDashboardState extends State<CashierDashboard> {
                 _buildActionCard(
                   title: 'My Sales',
                   icon: Icons.history,
-                  color: Colors.teal,
+                  color: AppColors.tertiaryColor,
                   onTap: () {
                     // Navigate to sales history
                   },
@@ -263,7 +346,7 @@ class _CashierDashboardState extends State<CashierDashboard> {
                 _buildActionCard(
                   title: 'Daily Report',
                   icon: Icons.bar_chart,
-                  color: Colors.indigo,
+                  color: AppColors.infoColor,
                   onTap: () {
                     // Navigate to reports
                   },
@@ -274,12 +357,9 @@ class _CashierDashboardState extends State<CashierDashboard> {
             const SizedBox(height: 24),
             
             // Recent sales section
-            const Text(
+            Text(
               'Recent Sales',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: AppTheme.sectionTitle,
             ),
             const SizedBox(height: 16),
             
@@ -287,11 +367,16 @@ class _CashierDashboardState extends State<CashierDashboard> {
             _dashboardData!.recentSales.isEmpty
                 ? Card(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Padding(
+                    elevation: 1,
+                    shadowColor: AppColors.shadowColor,
+                    child: Padding(
                       padding: EdgeInsets.all(16.0),
-                      child: Text('No recent sales data available'),
+                      child: Text(
+                        'No recent sales data available',
+                        style: TextStyle(color: AppColors.textSecondaryColor),
+                      ),
                     ),
                   )
                 : Column(
@@ -299,20 +384,33 @@ class _CashierDashboardState extends State<CashierDashboard> {
                       return Card(
                         margin: const EdgeInsets.only(bottom: 12),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(16),
                         ),
+                        elevation: 2,
+                        shadowColor: AppColors.shadowColor,
                         child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.orange.shade100,
-                            child: Icon(Icons.receipt, color: Colors.orange.shade800),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
                           ),
-                          title: Text('Invoice #${sale.receiptNumber}'),
-                          subtitle: Text('${sale.items} items • ${sale.time}'),
+                          leading: CircleAvatar(
+                            backgroundColor: AppColors.primaryColor.withOpacity(0.1),
+                            child: Icon(Icons.receipt, color: AppColors.primaryColor),
+                          ),
+                          title: Text(
+                            'Invoice #${sale.receiptNumber}',
+                            style: AppTheme.cardTitle,
+                          ),
+                          subtitle: Text(
+                            '${sale.items} items • ${sale.time}',
+                            style: AppTheme.cardSubtitle,
+                          ),
                           trailing: Text(
                             '$currencySymbol ${sale.total.toStringAsFixed(2)}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
+                              color: AppColors.primaryColor,
                             ),
                           ),
                           onTap: () {
@@ -337,8 +435,9 @@ class _CashierDashboardState extends State<CashierDashboard> {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
       ),
+      shadowColor: AppColors.shadowColor,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -352,9 +451,10 @@ class _CashierDashboardState extends State<CashierDashboard> {
             const SizedBox(height: 8),
             Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
+                color: AppColors.textPrimaryColor,
               ),
             ),
             const SizedBox(height: 4),
@@ -362,7 +462,7 @@ class _CashierDashboardState extends State<CashierDashboard> {
               title,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey.shade600,
+                color: AppColors.textSecondaryColor,
               ),
             ),
           ],
@@ -380,11 +480,12 @@ class _CashierDashboardState extends State<CashierDashboard> {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
       ),
+      shadowColor: AppColors.shadowColor,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -398,9 +499,10 @@ class _CashierDashboardState extends State<CashierDashboard> {
               const SizedBox(height: 12),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimaryColor,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -415,16 +517,17 @@ class _CashierDashboardState extends State<CashierDashboard> {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
       ),
-      color: Colors.red.shade50,
+      color: AppColors.errorColor.withOpacity(0.1),
+      shadowColor: AppColors.shadowColor,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
           children: [
             Icon(
               Icons.warning_amber_rounded,
-              color: Colors.red.shade700,
+              color: AppColors.errorColor,
               size: 32,
             ),
             const SizedBox(width: 16),
@@ -437,13 +540,13 @@ class _CashierDashboardState extends State<CashierDashboard> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.red.shade700,
+                      color: AppColors.errorColor,
                     ),
                   ),
                   Text(
                     '${_dashboardData!.lowStockCount} products are running low on stock',
                     style: TextStyle(
-                      color: Colors.red.shade700,
+                      color: AppColors.errorColor.withOpacity(0.8),
                     ),
                   ),
                 ],
@@ -453,10 +556,17 @@ class _CashierDashboardState extends State<CashierDashboard> {
               onPressed: () {
                 // Navigate to low stock page
               },
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.errorColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  side: BorderSide(color: AppColors.errorColor),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              ),
               child: Text(
                 'View',
                 style: TextStyle(
-                  color: Colors.red.shade700,
                   fontWeight: FontWeight.bold,
                 ),
               ),

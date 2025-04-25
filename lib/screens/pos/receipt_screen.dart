@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:pos_app/theme/app_theme.dart'; // Import the AppTheme
 
 class ReceiptScreen extends StatelessWidget {
   final String receiptNumber;
@@ -62,9 +63,16 @@ class ReceiptScreen extends StatelessWidget {
     final customer = receiptData['customer'] ?? {'name': 'Walk-in Customer', 'phone': '-'};
     
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        title: Text('Receipt'),
-        backgroundColor: Colors.orange.shade500,
+        title: Text(
+          'Receipt',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: AppColors.primaryColor,
         actions: [
           IconButton(
             icon: Icon(Icons.print),
@@ -73,6 +81,8 @@ class ReceiptScreen extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Printing is not implemented in this demo'),
+                  backgroundColor: AppColors.infoColor,
+                  behavior: SnackBarBehavior.floating,
                 ),
               );
             },
@@ -90,12 +100,12 @@ class ReceiptScreen extends StatelessWidget {
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.shade300,
-                        offset: Offset(0, 1),
-                        blurRadius: 5,
+                        color: AppColors.shadowColor,
+                        offset: Offset(0, 2),
+                        blurRadius: 10,
                       ),
                     ],
                   ),
@@ -105,9 +115,9 @@ class ReceiptScreen extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.orange.shade500,
+                          color: AppColors.primaryColor,
                           borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(8),
+                            top: Radius.circular(16),
                           ),
                         ),
                         child: Row(
@@ -149,7 +159,7 @@ class ReceiptScreen extends StatelessWidget {
                               child: Text(
                                 paymentMethod == 'cash' ? 'Cash' : 'Credit',
                                 style: TextStyle(
-                                  color: Colors.orange.shade700,
+                                  color: AppColors.primaryColor,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
                                 ),
@@ -166,29 +176,26 @@ class ReceiptScreen extends StatelessWidget {
                           children: [
                             Text(
                               'EldoGas',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: AppTheme.sectionTitle,
                             ),
                             SizedBox(height: 4),
                             Text(
                               'Tel: +254700123456',
                               style: TextStyle(
-                                color: Colors.grey.shade700,
+                                color: AppColors.textSecondaryColor,
                               ),
                             ),
                           ],
                         ),
                       ),
                       
-                      Divider(),
+                      Divider(color: AppColors.dividerColor),
                       
                       // Customer info (for credit)
                       if (paymentMethod == 'credit')
                         Container(
                           padding: EdgeInsets.all(16),
-                          color: Colors.orange.shade50,
+                          color: AppColors.primaryColor.withOpacity(0.05),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -197,7 +204,7 @@ class ReceiptScreen extends StatelessWidget {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
-                                  color: Colors.orange.shade800,
+                                  color: AppColors.primaryColor,
                                 ),
                               ),
                               SizedBox(height: 8),
@@ -206,14 +213,14 @@ class ReceiptScreen extends StatelessWidget {
                                   Icon(
                                     Icons.person,
                                     size: 16,
-                                    color: Colors.orange.shade700,
+                                    color: AppColors.secondaryColor,
                                   ),
                                   SizedBox(width: 8),
                                   Text(
                                     'Name:',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.orange.shade700,
+                                      color: AppColors.secondaryColor,
                                     ),
                                   ),
                                   SizedBox(width: 4),
@@ -221,7 +228,7 @@ class ReceiptScreen extends StatelessWidget {
                                     child: Text(
                                       customer['name'] ?? 'Walk-in Customer',
                                       style: TextStyle(
-                                        color: Colors.orange.shade700,
+                                        color: AppColors.textPrimaryColor,
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -234,14 +241,14 @@ class ReceiptScreen extends StatelessWidget {
                                   Icon(
                                     Icons.phone,
                                     size: 16,
-                                    color: Colors.orange.shade700,
+                                    color: AppColors.secondaryColor,
                                   ),
                                   SizedBox(width: 8),
                                   Text(
                                     'Phone:',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.orange.shade700,
+                                      color: AppColors.secondaryColor,
                                     ),
                                   ),
                                   SizedBox(width: 4),
@@ -249,7 +256,7 @@ class ReceiptScreen extends StatelessWidget {
                                     child: Text(
                                       customer['phone'] ?? '-',
                                       style: TextStyle(
-                                        color: Colors.orange.shade700,
+                                        color: AppColors.textPrimaryColor,
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -261,7 +268,7 @@ class ReceiptScreen extends StatelessWidget {
                         ),
                       
                       if (paymentMethod == 'credit')
-                        Divider(),
+                        Divider(color: AppColors.dividerColor),
                       
                       // Items header
                       Padding(
@@ -274,6 +281,7 @@ class ReceiptScreen extends StatelessWidget {
                                 'Item',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimaryColor,
                                 ),
                               ),
                             ),
@@ -283,6 +291,7 @@ class ReceiptScreen extends StatelessWidget {
                                 'Qty',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimaryColor,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -293,6 +302,7 @@ class ReceiptScreen extends StatelessWidget {
                                 'Price',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimaryColor,
                                 ),
                                 textAlign: TextAlign.right,
                               ),
@@ -303,6 +313,7 @@ class ReceiptScreen extends StatelessWidget {
                                 'Total',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimaryColor,
                                 ),
                                 textAlign: TextAlign.right,
                               ),
@@ -311,14 +322,17 @@ class ReceiptScreen extends StatelessWidget {
                         ),
                       ),
                       
-                      Divider(),
+                      Divider(color: AppColors.dividerColor),
                       
                       // Items list
                       ListView.separated(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
                         itemCount: items.length,
-                        separatorBuilder: (context, index) => Divider(height: 1),
+                        separatorBuilder: (context, index) => Divider(
+                          height: 1,
+                          color: AppColors.dividerColor,
+                        ),
                         itemBuilder: (context, index) {
                           final item = items[index];
                           return Padding(
@@ -339,6 +353,7 @@ class ReceiptScreen extends StatelessWidget {
                                         item['name'] ?? 'Unknown Item',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
+                                          color: AppColors.textPrimaryColor,
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 2,
@@ -349,7 +364,7 @@ class ReceiptScreen extends StatelessWidget {
                                           'S/N: ${item['serial_number']}',
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: Colors.grey.shade600,
+                                            color: AppColors.textSecondaryColor,
                                             fontStyle: FontStyle.italic,
                                           ),
                                           overflow: TextOverflow.ellipsis,
@@ -365,6 +380,9 @@ class ReceiptScreen extends StatelessWidget {
                                   child: Text(
                                     '${item['quantity'] ?? 0}',
                                     textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: AppColors.textPrimaryColor,
+                                    ),
                                   ),
                                 ),
                                 
@@ -375,6 +393,9 @@ class ReceiptScreen extends StatelessWidget {
                                     'KSh ${formatNumber(item['price'])}',
                                     textAlign: TextAlign.right,
                                     overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: AppColors.textPrimaryColor,
+                                    ),
                                   ),
                                 ),
                                 
@@ -385,6 +406,7 @@ class ReceiptScreen extends StatelessWidget {
                                     'KSh ${formatNumber(item['subtotal'])}',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimaryColor,
                                     ),
                                     textAlign: TextAlign.right,
                                     overflow: TextOverflow.ellipsis,
@@ -396,7 +418,7 @@ class ReceiptScreen extends StatelessWidget {
                         },
                       ),
                       
-                      Divider(),
+                      Divider(color: AppColors.dividerColor),
                       
                       // Totals
                       Padding(
@@ -406,20 +428,40 @@ class ReceiptScreen extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('Subtotal:'),
-                                Text('KSh ${formatNumber(total)}'),
+                                Text(
+                                  'Subtotal:',
+                                  style: TextStyle(
+                                    color: AppColors.textPrimaryColor,
+                                  ),
+                                ),
+                                Text(
+                                  'KSh ${formatNumber(total)}',
+                                  style: TextStyle(
+                                    color: AppColors.textPrimaryColor,
+                                  ),
+                                ),
                               ],
                             ),
                             SizedBox(height: 8),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('Tax (0%):'),
-                                Text('KSh 0.00'),
+                                Text(
+                                  'Tax (0%):',
+                                  style: TextStyle(
+                                    color: AppColors.textPrimaryColor,
+                                  ),
+                                ),
+                                Text(
+                                  'KSh 0.00',
+                                  style: TextStyle(
+                                    color: AppColors.textPrimaryColor,
+                                  ),
+                                ),
                               ],
                             ),
                             SizedBox(height: 8),
-                            Divider(),
+                            Divider(color: AppColors.dividerColor),
                             SizedBox(height: 8),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -429,6 +471,7 @@ class ReceiptScreen extends StatelessWidget {
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
+                                    color: AppColors.textPrimaryColor,
                                   ),
                                 ),
                                 Text(
@@ -436,7 +479,7 @@ class ReceiptScreen extends StatelessWidget {
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 18,
-                                    color: Colors.orange.shade700,
+                                    color: AppColors.primaryColor,
                                   ),
                                 ),
                               ],
@@ -445,7 +488,7 @@ class ReceiptScreen extends StatelessWidget {
                         ),
                       ),
                       
-                      Divider(),
+                      Divider(color: AppColors.dividerColor),
                       
                       // Footer
                       Padding(
@@ -457,6 +500,7 @@ class ReceiptScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
+                                color: AppColors.textPrimaryColor,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -464,7 +508,7 @@ class ReceiptScreen extends StatelessWidget {
                             Text(
                               'Keep this receipt for any returns or exchanges.',
                               style: TextStyle(
-                                color: Colors.grey.shade700,
+                                color: AppColors.textSecondaryColor,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -474,6 +518,7 @@ class ReceiptScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
+                                color: AppColors.primaryColor,
                               ),
                             ),
                           ],
@@ -496,22 +541,20 @@ class ReceiptScreen extends StatelessWidget {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('Receipt number copied to clipboard'),
+                              backgroundColor: AppColors.infoColor,
+                              behavior: SnackBarBehavior.floating,
                             ),
                           );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.grey.shade200,
-                          foregroundColor: Colors.black,
+                          foregroundColor: AppColors.textPrimaryColor,
                         ),
                         icon: Icon(Icons.copy),
                         label: Text('Copy Number'),
                       ),
                       ElevatedButton.icon(
                         onPressed: onClose,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange.shade500,
-                          foregroundColor: Colors.white,
-                        ),
                         icon: Icon(Icons.add_shopping_cart),
                         label: Text('New Sale'),
                       ),

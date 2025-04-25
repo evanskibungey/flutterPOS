@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:pos_app/models/category.dart';
 import 'package:pos_app/models/product.dart';
 import 'package:pos_app/services/product_service.dart';
+import 'package:pos_app/theme/app_theme.dart'; // Import the AppTheme
 
 
 class ProductFormScreen extends StatefulWidget {
@@ -90,9 +91,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     
     if (_selectedCategoryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Please select a category'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.errorColor,
+          behavior: SnackBarBehavior.floating,
         ),
       );
       return false;
@@ -120,7 +122,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error picking image: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.errorColor,
+          behavior: SnackBarBehavior.floating,
         ),
       );
     }
@@ -131,21 +134,30 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Select Image Source'),
+        title: Text(
+          'Select Image Source',
+          style: TextStyle(
+            color: AppColors.textPrimaryColor,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text('Gallery'),
+              leading: Icon(Icons.photo_library, color: AppColors.primaryColor),
+              title: Text('Gallery', style: TextStyle(color: AppColors.textPrimaryColor)),
               onTap: () {
                 Navigator.of(context).pop();
                 _pickImage(ImageSource.gallery);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text('Camera'),
+              leading: Icon(Icons.camera_alt, color: AppColors.primaryColor),
+              title: Text('Camera', style: TextStyle(color: AppColors.textPrimaryColor)),
               onTap: () {
                 Navigator.of(context).pop();
                 _pickImage(ImageSource.camera);
@@ -190,9 +202,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         );
         
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Product updated successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.successColor,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       } else {
@@ -203,9 +216,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         );
         
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Product created successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.successColor,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -221,7 +235,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(_errorMessage!),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.errorColor,
+          behavior: SnackBarBehavior.floating,
         ),
       );
     }
@@ -232,12 +247,19 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     final isEditing = widget.product != null;
     
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        title: Text(isEditing ? 'Edit Product' : 'Add Product'),
-        backgroundColor: Colors.orange.shade500,
+        title: Text(
+          isEditing ? 'Edit Product' : 'Add Product',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: AppColors.primaryColor,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator(color: AppColors.primaryColor))
           : Form(
               key: _formKey,
               child: SingleChildScrollView(
@@ -257,12 +279,19 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                 height: 150,
                                 decoration: BoxDecoration(
                                   color: Colors.grey.shade200,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.grey.shade300),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: AppColors.borderColor),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.shadowColor,
+                                      blurRadius: 5,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
                                 child: _imageFile != null
                                     ? ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(16),
                                         child: Image.file(
                                           _imageFile!,
                                           fit: BoxFit.cover,
@@ -270,26 +299,26 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                       )
                                     : _currentImageUrl != null
                                         ? ClipRRect(
-                                            borderRadius: BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(16),
                                             child: Image.network(
                                               _currentImageUrl!,
                                               fit: BoxFit.cover,
                                               errorBuilder: (context, error, stackTrace) {
-                                                return const Center(
+                                                return Center(
                                                   child: Icon(
                                                     Icons.image_not_supported,
                                                     size: 50,
-                                                    color: Colors.grey,
+                                                    color: AppColors.textTertiaryColor,
                                                   ),
                                                 );
                                               },
                                             ),
                                           )
-                                        : const Center(
+                                        : Center(
                                             child: Icon(
                                               Icons.image,
                                               size: 50,
-                                              color: Colors.grey,
+                                              color: AppColors.textTertiaryColor,
                                             ),
                                           ),
                               ),
@@ -301,8 +330,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                   child: Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: Colors.orange.shade500,
+                                      color: AppColors.secondaryColor,
                                       shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppColors.shadowColor,
+                                          blurRadius: 3,
+                                          offset: Offset(0, 1),
+                                        ),
+                                      ],
                                     ),
                                     child: const Icon(
                                       Icons.camera_alt,
@@ -315,10 +351,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                             ],
                           ),
                           const SizedBox(height: 16),
-                          const Text(
+                          Text(
                             'Tap to change image',
                             style: TextStyle(
-                              color: Colors.grey,
+                              color: AppColors.textTertiaryColor,
                               fontSize: 12,
                             ),
                           ),
@@ -330,9 +366,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     // Name field
                     TextFormField(
                       controller: _nameController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Product Name',
-                        border: OutlineInputBorder(),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                        ),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -346,9 +388,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     // Description field
                     TextFormField(
                       controller: _descriptionController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Description (optional)',
-                        border: OutlineInputBorder(),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                        ),
                       ),
                       maxLines: 3,
                     ),
@@ -356,9 +404,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     
                     // Category dropdown
                     DropdownButtonFormField<int>(
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Category',
-                        border: OutlineInputBorder(),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                        ),
                       ),
                       value: _selectedCategoryId,
                       items: widget.categories.map((category) {
@@ -390,7 +444,13 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                             decoration: InputDecoration(
                               labelText: 'Selling Price',
                               prefixText: widget.currencySymbol,
-                              border: const OutlineInputBorder(),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                              ),
                             ),
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             inputFormatters: [
@@ -417,7 +477,13 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                             decoration: InputDecoration(
                               labelText: 'Cost Price',
                               prefixText: widget.currencySymbol,
-                              border: const OutlineInputBorder(),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                              ),
                             ),
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             inputFormatters: [
@@ -447,9 +513,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                         Expanded(
                           child: TextFormField(
                             controller: _stockController,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: 'Current Stock',
-                              border: OutlineInputBorder(),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                              ),
                             ),
                             keyboardType: TextInputType.number,
                             inputFormatters: [
@@ -473,9 +545,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                         Expanded(
                           child: TextFormField(
                             controller: _minStockController,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: 'Min Stock Level',
-                              border: OutlineInputBorder(),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                              ),
                             ),
                             keyboardType: TextInputType.number,
                             inputFormatters: [
@@ -500,12 +578,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     const SizedBox(height: 16),
                     
                     // Status
-                    const Text(
+                    Text(
                       'Status',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: AppTheme.sectionTitle.copyWith(fontSize: 16),
                     ),
                     Row(
                       children: [
@@ -514,6 +589,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                             title: const Text('Active'),
                             value: 'active',
                             groupValue: _status,
+                            activeColor: AppColors.successColor,
                             onChanged: (value) {
                               setState(() {
                                 _status = value!;
@@ -526,6 +602,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                             title: const Text('Inactive'),
                             value: 'inactive',
                             groupValue: _status,
+                            activeColor: AppColors.primaryColor,
                             onChanged: (value) {
                               setState(() {
                                 _status = value!;
@@ -539,13 +616,13 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     
                     // Product info if editing
                     if (isEditing) ...[
-                      const Divider(),
+                      Divider(color: AppColors.dividerColor),
                       const SizedBox(height: 8),
                       Text(
                         'SKU: ${widget.product!.sku}',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey.shade700,
+                          color: AppColors.textSecondaryColor,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -553,7 +630,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                         'Serial: ${widget.product!.serialNumber}',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey.shade700,
+                          color: AppColors.textSecondaryColor,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -565,8 +642,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       child: ElevatedButton(
                         onPressed: _saveProduct,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange.shade500,
-                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
                         child: Text(
@@ -584,8 +659,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       const SizedBox(height: 16),
                       Text(
                         _errorMessage!,
-                        style: const TextStyle(
-                          color: Colors.red,
+                        style: TextStyle(
+                          color: AppColors.errorColor,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

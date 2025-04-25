@@ -5,6 +5,7 @@ import 'package:pos_app/screens/admin/product/stock_movement_screen.dart';
 import 'package:pos_app/screens/admin/product/stock_update_dialog.dart';
 import 'package:pos_app/services/category_service.dart';
 import 'package:pos_app/services/product_service.dart';
+import 'package:pos_app/theme/app_theme.dart';
 
 import 'product_form_screen.dart';
 
@@ -88,6 +89,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
         status: _statusFilter,
         stockStatus: _stockStatusFilter,
         sort: _sortBy,
+        sortDirection: 'desc', // Always show newest first
         page: _currentPage,
       );
 
@@ -209,9 +211,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Product deleted successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.successColor,
           ),
         );
 
@@ -220,7 +222,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
       } catch (e) {
         // Show error message
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+          SnackBar(content: Text(e.toString()), backgroundColor: AppColors.errorColor),
         );
       }
     }
@@ -260,9 +262,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Stock updated successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.successColor,
           ),
         );
 
@@ -273,7 +275,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error updating stock: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.errorColor,
           ),
         );
       }
@@ -285,7 +287,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Products'),
-        backgroundColor: Colors.orange.shade500,
+        backgroundColor: AppColors.primaryColor,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -306,9 +308,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   controller: _searchController,
                   decoration: InputDecoration(
                     hintText: 'Search products...',
-                    prefixIcon: const Icon(Icons.search),
+                    prefixIcon: Icon(Icons.search, color: AppColors.secondaryColor),
                     suffixIcon: IconButton(
-                      icon: const Icon(Icons.clear),
+                      icon: Icon(Icons.clear, color: AppColors.secondaryColor),
                       onPressed: () {
                         _searchController.clear();
                         _handleSearch();
@@ -316,6 +318,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: AppColors.secondaryColor, width: 2),
                     ),
                   ),
                   onSubmitted: (_) => _handleSearch(),
@@ -435,36 +441,36 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
                     // Sort by dropdown
                     Expanded(
-                      child: DropdownButtonFormField<String>(
-                        decoration: InputDecoration(
-                          labelText: 'Sort By',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                        ),
-                        value: _sortBy,
-                        items: const [
-                          DropdownMenuItem<String>(
-                            value: 'name',
-                            child: Text('Name'),
-                          ),
-                          DropdownMenuItem<String>(
-                            value: 'price',
-                            child: Text('Price'),
-                          ),
-                          DropdownMenuItem<String>(
-                            value: 'stock',
-                            child: Text('Stock'),
-                          ),
-                          DropdownMenuItem<String>(
-                            value: 'created_at',
-                            child: Text('Newest'),
-                          ),
-                        ],
+                    child: DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                    labelText: 'Sort By',
+                    border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                    ),
+                    ),
+                    value: _sortBy,
+                    items: const [
+                    DropdownMenuItem<String>(
+                    value: 'created_at',
+                    child: Text('Newest'),
+                    ),
+                    DropdownMenuItem<String>(
+                    value: 'name',
+                    child: Text('Name'),
+                    ),
+                    DropdownMenuItem<String>(
+                    value: 'price',
+                    child: Text('Price'),
+                    ),
+                    DropdownMenuItem<String>(
+                    value: 'stock',
+                    child: Text('Stock'),
+                    ),
+                    ],
                         onChanged: (value) {
                           if (value != null) {
                             _handleSortChange(value);
@@ -517,6 +523,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
                         itemBuilder: (context, index) {
                           final product = _products[index];
                           final bool isLowStock = product.isLowStock();
+                          final Color stockStatusColor = AppTheme.getStockStatusColor(
+                            product.stock, 
+                            product.minStock,
+                          );
 
                           return Card(
                             margin: const EdgeInsets.symmetric(
@@ -528,7 +538,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                               side:
                                   isLowStock
                                       ? BorderSide(
-                                        color: Colors.red.shade300,
+                                        color: stockStatusColor.withOpacity(0.5),
                                         width: 1,
                                       )
                                       : BorderSide.none,
@@ -597,7 +607,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                     decoration: BoxDecoration(
                                       color:
                                           product.status == 'active'
-                                              ? Colors.green
+                                              ? AppColors.successColor
                                               : Colors.grey,
                                       borderRadius: BorderRadius.circular(12),
                                     ),
@@ -637,7 +647,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                             style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.blue.shade800,
+                                              color: AppColors.primaryColor,
                                             ),
                                           ),
                                         ],
@@ -653,10 +663,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                               Icon(
                                                 Icons.inventory,
                                                 size: 16,
-                                                color:
-                                                    isLowStock
-                                                        ? Colors.red
-                                                        : Colors.green,
+                                                color: stockStatusColor,
                                               ),
                                               const SizedBox(width: 4),
                                               Text(
@@ -664,10 +671,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                                 style: TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.bold,
-                                                  color:
-                                                      isLowStock
-                                                          ? Colors.red
-                                                          : Colors.green,
+                                                  color: stockStatusColor,
                                                 ),
                                               ),
                                             ],
@@ -690,36 +694,39 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                   alignment: MainAxisAlignment.spaceEvenly,
                                   children: [
                                     TextButton.icon(
-                                      icon: const Icon(Icons.edit),
-                                      label: const Text('Edit'),
-                                      onPressed: () => _editProduct(product),
-                                    ),
+                                    icon: const Icon(Icons.edit),
+                                    label: const Text('Edit'),
+                                    onPressed: () => _editProduct(product),
+                                      style: TextButton.styleFrom(
+                                    foregroundColor: AppColors.primaryColor,
+                                  ),
+                                ),
                                     PopupMenuButton<String>(
-                                      icon: const Icon(Icons.inventory_2),
-                                      tooltip: 'Stock Management',
-                                      onSelected: (value) {
-                                        if (value == 'update') {
-                                          _updateStock(product);
-                                        } else if (value == 'history') {
-                                          Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                              builder:
-                                                  (_) => StockMovementScreen(
-                                                    product: product,
-                                                    currencySymbol:
-                                                        _currencySymbol,
-                                                  ),
-                                            ),
-                                          );
-                                        }
-                                      },
+                                    icon: Icon(Icons.inventory_2, color: AppColors.primaryColor),
+                                    tooltip: 'Stock Management',
+                                    onSelected: (value) {
+                                    if (value == 'update') {
+                                    _updateStock(product);
+                                    } else if (value == 'history') {
+                                    Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                    builder:
+                                    (_) => StockMovementScreen(
+                                    product: product,
+                                    currencySymbol:
+                                    _currencySymbol,
+                                    ),
+                                    ),
+                                    );
+                                    }
+                                    },
                                       itemBuilder:
                                           (context) => [
                                             const PopupMenuItem(
                                               value: 'update',
                                               child: Row(
                                                 children: [
-                                                  Icon(Icons.edit, size: 20),
+                                                  Icon(Icons.edit, size: 20, color: AppColors.secondaryColor),
                                                   SizedBox(width: 8),
                                                   Text('Update Stock'),
                                                 ],
@@ -729,7 +736,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                               value: 'history',
                                               child: Row(
                                                 children: [
-                                                  Icon(Icons.history, size: 20),
+                                                  Icon(Icons.history, size: 20, color: AppColors.secondaryColor),
                                                   SizedBox(width: 8),
                                                   Text('Stock History'),
                                                 ],
@@ -742,7 +749,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                       label: const Text('Delete'),
                                       onPressed: () => _deleteProduct(product),
                                       style: TextButton.styleFrom(
-                                        foregroundColor: Colors.red,
+                                        foregroundColor: AppColors.errorColor,
                                       ),
                                     ),
                                   ],
@@ -773,8 +780,22 @@ class _ProductListScreenState extends State<ProductListScreen> {
                               _loadProducts();
                             }
                             : null,
+                    color: _currentPage > 1 ? AppColors.primaryColor : Colors.grey,
                   ),
-                  Text('$_currentPage / $_lastPage'),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '$_currentPage / $_lastPage',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryColor,
+                      ),
+                    ),
+                  ),
                   IconButton(
                     icon: const Icon(Icons.chevron_right),
                     onPressed:
@@ -786,6 +807,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                               _loadProducts();
                             }
                             : null,
+                    color: _currentPage < _lastPage ? AppColors.primaryColor : Colors.grey,
                   ),
                 ],
               ),
@@ -794,7 +816,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addProduct,
-        backgroundColor: Colors.orange.shade500,
+        backgroundColor: AppColors.secondaryColor,
         child: const Icon(Icons.add),
         tooltip: 'Add Product',
       ),

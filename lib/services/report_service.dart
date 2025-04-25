@@ -194,6 +194,11 @@ class ReportService {
   }) async {
     final cacheKey = 'inventory_report_${jsonEncode(filter.toQueryParams())}';
 
+    // If we explicitly don't want to use cache, clear any existing cache for this key
+    if (!useCache) {
+      _cache.remove(cacheKey);
+    }
+    
     if (useCache) {
       final cached = _cache.get(cacheKey);
       if (cached != null) {

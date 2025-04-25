@@ -5,6 +5,7 @@ import 'package:pos_app/models/payment.dart';
 import '../../models/customer.dart';
 import '../../services/credit_service.dart';
 import '../../utils/format_utils.dart';
+import '../../theme/app_theme.dart'; // Import the AppTheme
 import 'record_payment_screen.dart';
 
 class CustomerCreditDetailScreen extends StatefulWidget {
@@ -67,8 +68,16 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        title: Text(_customer?.name ?? 'Customer Details'),
+        title: Text(
+          _customer?.name ?? 'Customer Details',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: AppColors.primaryColor,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -79,6 +88,7 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
             ? null
             : TabBar(
                 controller: _tabController,
+                indicatorColor: Colors.white,
                 tabs: const [
                   Tab(text: 'Credit Sales'),
                   Tab(text: 'Payments'),
@@ -86,21 +96,42 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
               ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator(color: AppColors.primaryColor))
           : _error != null
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'Error: $_error',
-                        style: const TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
+                      Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: AppColors.errorColor,
                       ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
+                      SizedBox(height: 16),
+                      Text(
+                        'Error',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.errorColor,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                        child: Text(
+                          _error!,
+                          style: TextStyle(
+                            color: AppColors.textSecondaryColor,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      SizedBox(height: 24),
+                      ElevatedButton.icon(
                         onPressed: _loadCustomerDetails,
-                        child: const Text('Retry'),
+                        icon: Icon(Icons.refresh),
+                        label: Text('Retry'),
                       ),
                     ],
                   ),
@@ -121,6 +152,7 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
               },
               label: const Text('Record Payment'),
               icon: const Icon(Icons.add),
+              backgroundColor: AppColors.secondaryColor,
             )
           : null,
     );
@@ -128,7 +160,23 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
 
   Widget _buildContent() {
     if (_customer == null) {
-      return const Center(child: Text('Customer information not available'));
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.person_off_outlined,
+              size: 80,
+              color: AppColors.textTertiaryColor,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Customer information not available',
+              style: AppTheme.sectionTitle,
+            ),
+          ],
+        ),
+      );
     }
 
     return Column(
@@ -137,7 +185,11 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Card(
-            elevation: 4,
+            elevation: 2,
+            shadowColor: AppColors.shadowColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -147,7 +199,7 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CircleAvatar(
-                        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        backgroundColor: AppColors.primaryColor.withOpacity(0.1),
                         radius: 24,
                         child: Text(
                           _customer?.name != null && _customer!.name.isNotEmpty 
@@ -155,7 +207,7 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
                               : '?',
                           style: TextStyle(
                             fontSize: 24,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: AppColors.primaryColor,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -167,39 +219,46 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
                           children: [
                             Text(
                               _customer?.name ?? 'Unknown Customer',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: AppTheme.cardTitle.copyWith(fontSize: 18),
                             ),
                             const SizedBox(height: 4),
-                            Text('Phone: ${_customer?.phone ?? 'N/A'}'),
+                            Text(
+                              'Phone: ${_customer?.phone ?? 'N/A'}',
+                              style: AppTheme.cardSubtitle,
+                            ),
                             if (_customer?.email != null && _customer!.email!.isNotEmpty)
-                              Text('Email: ${_customer!.email}'),
+                              Text(
+                                'Email: ${_customer!.email}',
+                                style: AppTheme.cardSubtitle,
+                              ),
                             if (_customer?.address != null && _customer!.address!.isNotEmpty)
-                              Text('Address: ${_customer!.address}'),
+                              Text(
+                                'Address: ${_customer!.address}',
+                                style: AppTheme.cardSubtitle,
+                              ),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const Divider(height: 32),
+                  Divider(height: 32, color: AppColors.dividerColor),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Outstanding Balance:',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
+                          color: AppColors.textPrimaryColor,
                         ),
                       ),
                       Text(
                         'KSh ${formatCurrency(_customer?.balance ?? 0.0)}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFFD35400),
+                          color: AppColors.primaryColor,
                         ),
                       ),
                     ],
@@ -226,10 +285,25 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
 
   Widget _buildCreditSalesTab() {
     if (_creditSales.isEmpty) {
-      return const Center(
-        child: Text(
-          'No credit sales found',
-          style: TextStyle(fontSize: 16),
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.receipt_long_outlined,
+              size: 64,
+              color: AppColors.textTertiaryColor,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'No credit sales found',
+              style: TextStyle(
+                fontSize: 16,
+                color: AppColors.textSecondaryColor,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       );
     }
@@ -241,6 +315,11 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
         
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          elevation: 2,
+          shadowColor: AppColors.shadowColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -251,17 +330,14 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
                   children: [
                     Text(
                       'Sale #${creditSale.referenceNo}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+                      style: AppTheme.cardTitle,
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: creditSale.paymentStatus == 'paid'
-                            ? Colors.green.withOpacity(0.1)
-                            : Colors.orange.withOpacity(0.1),
+                            ? AppColors.successColor.withOpacity(0.1)
+                            : AppColors.warningColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -270,8 +346,8 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                           color: creditSale.paymentStatus == 'paid'
-                              ? Colors.green
-                              : Colors.orange,
+                              ? AppColors.successColor
+                              : AppColors.warningColor,
                         ),
                       ),
                     ),
@@ -281,10 +357,10 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
                 Text(
                   'Date: ${DateFormat('MMM dd, yyyy').format(creditSale.createdAt)}',
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: AppColors.textSecondaryColor,
                   ),
                 ),
-                const Divider(height: 24),
+                Divider(height: 24, color: AppColors.dividerColor),
                 
                 // Sale Items
                 ...creditSale.items.map((item) => Padding(
@@ -295,34 +371,40 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
                       Expanded(
                         child: Text(
                           '${item.quantity}x ${item.product?['name'] ?? 'Product'}',
-                          style: const TextStyle(fontSize: 14),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textPrimaryColor,
+                          ),
                         ),
                       ),
                       Text(
                         'KSh ${formatCurrency(item.subtotal)}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w500,
+                          color: AppColors.textPrimaryColor,
                         ),
                       ),
                     ],
                   ),
                 )),
                 
-                const Divider(height: 24),
+                Divider(height: 24, color: AppColors.dividerColor),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Total Amount:',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimaryColor,
                       ),
                     ),
                     Text(
                       'KSh ${formatCurrency(creditSale.finalAmount)}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
+                        color: AppColors.primaryColor,
                       ),
                     ),
                   ],
@@ -337,10 +419,25 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
 
   Widget _buildPaymentsTab() {
     if (_payments.isEmpty) {
-      return const Center(
-        child: Text(
-          'No payments recorded yet',
-          style: TextStyle(fontSize: 16),
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.payments_outlined,
+              size: 64,
+              color: AppColors.textTertiaryColor,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'No payments recorded yet',
+              style: TextStyle(
+                fontSize: 16,
+                color: AppColors.textSecondaryColor,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       );
     }
@@ -352,6 +449,11 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
         
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          elevation: 2,
+          shadowColor: AppColors.shadowColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: ListTile(
             contentPadding: const EdgeInsets.all(16),
             title: Row(
@@ -359,16 +461,14 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
               children: [
                 Text(
                   'Payment #${payment.id}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTheme.cardTitle,
                 ),
                 Text(
                   'KSh ${formatCurrency(payment.amount)}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: Color(0xFFD35400),
+                    color: AppColors.primaryColor,
                   ),
                 ),
               ],
@@ -379,15 +479,18 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
                 const SizedBox(height: 8),
                 Text(
                   'Date: ${DateFormat('MMM dd, yyyy').format(payment.createdAt)}',
+                  style: AppTheme.cardSubtitle,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'Method: ${payment.paymentMethod.replaceAll('_', ' ').toUpperCase()}',
+                  style: AppTheme.cardSubtitle,
                 ),
                 if (payment.referenceNumber != null && payment.referenceNumber!.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
                     'Reference: ${payment.referenceNumber}',
+                    style: AppTheme.cardSubtitle,
                   ),
                 ],
                 if (payment.notes != null && payment.notes!.isNotEmpty) ...[
@@ -396,7 +499,7 @@ class _CustomerCreditDetailScreenState extends State<CustomerCreditDetailScreen>
                     'Notes: ${payment.notes}',
                     style: TextStyle(
                       fontStyle: FontStyle.italic,
-                      color: Colors.grey[600],
+                      color: AppColors.textSecondaryColor,
                     ),
                   ),
                 ],

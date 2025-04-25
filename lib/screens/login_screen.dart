@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pos_app/utils/lpglogo.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/auth_service.dart';
 import '../screens/admin/admin_dashboard.dart';
 import '../screens/cashier/cashier_dashboard.dart';
+import '../theme/app_theme.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -120,8 +122,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.orange.shade600,
-              Colors.orange.shade400,
+              AppColors.primaryColor,
+              AppColors.secondaryColor,
             ],
           ),
         ),
@@ -164,10 +166,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                 const SizedBox(height: 16),
                                 Text(
                                   'Eldo Gas',
-                                  style: TextStyle(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 32,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.orange.shade700,
+                                    color: AppColors.primaryColor,
                                   ),
                                 ),
                               ],
@@ -192,13 +194,13 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                               padding: const EdgeInsets.all(12),
                               margin: const EdgeInsets.only(bottom: 24),
                               decoration: BoxDecoration(
-                                color: Colors.red.shade50,
+                                color: AppColors.errorColor.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.red.shade200),
+                                border: Border.all(color: AppColors.errorColor.withOpacity(0.3)),
                               ),
                               child: Text(
                                 _errorMessage!,
-                                style: TextStyle(color: Colors.red.shade800),
+                                style: TextStyle(color: AppColors.errorColor),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -210,14 +212,14 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             decoration: InputDecoration(
                               labelText: 'Email Address',
                               hintText: 'your@email.com',
-                              prefixIcon: Icon(Icons.email_outlined, color: Colors.orange.shade500),
+                              prefixIcon: Icon(Icons.email_outlined, color: AppColors.secondaryColor),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide(color: Colors.grey.shade300),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(color: Colors.orange.shade500, width: 2),
+                                borderSide: BorderSide(color: AppColors.secondaryColor, width: 2),
                               ),
                             ),
                             validator: (value) {
@@ -239,13 +241,13 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             decoration: InputDecoration(
                               labelText: 'Password',
                               hintText: '••••••••',
-                              prefixIcon: Icon(Icons.lock_outline, color: Colors.orange.shade500),
+                              prefixIcon: Icon(Icons.lock_outline, color: AppColors.secondaryColor),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   _obscurePassword 
                                     ? Icons.visibility_off_outlined 
                                     : Icons.visibility_outlined,
-                                  color: Colors.orange.shade500,
+                                  color: AppColors.secondaryColor,
                                 ),
                                 onPressed: () {
                                   setState(() {
@@ -284,7 +286,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                         _rememberMe = value ?? false;
                                       });
                                     },
-                                    activeColor: Colors.orange.shade500,
+                                    activeColor: AppColors.secondaryColor,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(4),
                                     ),
@@ -298,14 +300,14 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text('Forgot password feature coming soon'),
-                                      backgroundColor: Colors.orange.shade500,
+                                      backgroundColor: AppColors.secondaryColor,
                                     ),
                                   );
                                 },
                                 child: Text(
                                   'Forgot password?',
                                   style: TextStyle(
-                                    color: Colors.orange.shade600,
+                                    color: AppColors.secondaryColor,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -318,7 +320,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           ElevatedButton(
                             onPressed: _isLoading ? null : _login,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange.shade500,
+                              backgroundColor: AppColors.secondaryColor,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(

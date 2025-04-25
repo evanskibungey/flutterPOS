@@ -5,6 +5,7 @@ import 'package:pos_app/services/settings_service.dart';
 import '../../models/report_models.dart';
 import '../../models/product.dart';
 import '../../services/product_service.dart';
+import '../../theme/app_theme.dart';
 
 class InventoryReportScreen extends StatefulWidget {
   const InventoryReportScreen({Key? key}) : super(key: key);
@@ -80,7 +81,7 @@ class _InventoryReportScreenState extends State<InventoryReportScreen> {
     }
   }
   
-  Future<void> _loadReport() async {
+  Future<void> _loadReport({bool useCache = true}) async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -107,6 +108,7 @@ class _InventoryReportScreenState extends State<InventoryReportScreen> {
       final reportData = await _reportService.getInventoryReport(
         filter,
         requestId: _requestId,
+        useCache: useCache, // Pass the useCache parameter
       );
       
       // Debug the API response structure
@@ -528,8 +530,21 @@ class _InventoryReportScreenState extends State<InventoryReportScreen> {
         ),
       );
       
-      // Reload the report to show updated data
-      _loadReport();
+      // Update the local list immediately with the updated product
+      setState(() {
+        if (_reportData != null && _reportData!['products'] != null) {
+          List<Product> products = _reportData!['products'] as List<Product>;
+          
+          // Find and update the product in the local list
+          final index = products.indexWhere((p) => p.id == productId);
+          if (index != -1) {
+            products[index] = updatedProduct;
+          }
+        }
+      });
+      
+      // Force reload the report without using cache to ensure fresh data
+      _loadReport(useCache: false);
     } catch (e) {
       // Close loading dialog if open
       if (Navigator.of(context).canPop()) {
@@ -586,13 +601,7 @@ class _InventoryReportScreenState extends State<InventoryReportScreen> {
   
   // Helper function to get color based on stock status
   Color _getStockStatusColor(Product product) {
-    if (product.stock <= 0) {
-      return Colors.red;
-    } else if (product.stock <= product.minStock) {
-      return Colors.orange;
-    } else {
-      return Colors.green;
-    }
+    return AppTheme.getStockStatusColor(product.stock, product.minStock);
   }
   
   @override
@@ -695,12 +704,12 @@ class _InventoryReportScreenState extends State<InventoryReportScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.red[50],
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.error_outline, size: 48, color: Colors.red[700]),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+            color: AppColors.errorColor.withOpacity(0.1),
+            shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.error_outline, size: 48, color: AppColors.errorColor),
             ),
             const SizedBox(height: 20),
             Text(
@@ -720,7 +729,7 @@ class _InventoryReportScreenState extends State<InventoryReportScreen> {
               onPressed: _loadReport,
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                backgroundColor: Colors.blue,
+                backgroundColor: AppColors.primaryColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -805,7 +814,7 @@ class _InventoryReportScreenState extends State<InventoryReportScreen> {
                   avatar: Icon(
                     Icons.filter_list,
                     size: 18,
-                    color: Colors.blue,
+                    color: AppColors.primaryColor,
                   ),
                   label: Text('Filters'),
                   onPressed: () {
@@ -824,12 +833,12 @@ class _InventoryReportScreenState extends State<InventoryReportScreen> {
                 FilterChip(
                   label: Text('Low Stock'),
                   selected: _showLowStock,
-                  selectedColor: Colors.orange.withOpacity(0.2),
-                  checkmarkColor: Colors.orange,
+                  selectedColor: AppColors.tertiaryColor.withOpacity(0.2),
+                  checkmarkColor: AppColors.tertiaryColor,
                   avatar: Icon(
                     Icons.warning_amber_outlined,
                     size: 18,
-                    color: _showLowStock ? Colors.orange : Colors.grey,
+                    color: _showLowStock ? AppColors.warningColor : Colors.grey,
                   ),
                   onSelected: (selected) {
                     setState(() {
@@ -847,12 +856,12 @@ class _InventoryReportScreenState extends State<InventoryReportScreen> {
                 FilterChip(
                   label: Text('Out of Stock'),
                   selected: _showOutOfStock,
-                  selectedColor: Colors.red.withOpacity(0.2),
-                  checkmarkColor: Colors.red,
+                  selectedColor: AppColors.errorColor.withOpacity(0.2),
+                  checkmarkColor: AppColors.errorColor,
                   avatar: Icon(
                     Icons.remove_shopping_cart_outlined,
                     size: 18,
-                    color: _showOutOfStock ? Colors.red : Colors.grey,
+                    color: _showOutOfStock ? AppColors.errorColor : Colors.grey,
                   ),
                   onSelected: (selected) {
                     setState(() {
@@ -930,7 +939,7 @@ class _InventoryReportScreenState extends State<InventoryReportScreen> {
                     height: 16,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
                     ),
                   ),
               ],
@@ -1079,10 +1088,10 @@ class _InventoryReportScreenState extends State<InventoryReportScreen> {
                 _loadReport();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: AppColors.primaryColor,
                 padding: EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(8),
                 ),
               ),
               child: Text(

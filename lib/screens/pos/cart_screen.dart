@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pos_app/screens/pos/receipt_screen.dart';
 import 'package:pos_app/services/pos_service.dart';
+import 'package:pos_app/theme/app_theme.dart'; // Import the AppTheme
 
 // Re-use the CartItem class from POSSalesScreen
 import 'package:pos_app/screens/pos/pos_sales_screen.dart';
@@ -72,7 +73,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
             Text('Item removed from cart'),
           ],
         ),
-        backgroundColor: Colors.red.shade600,
+        backgroundColor: AppColors.errorColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -103,7 +104,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
               ),
             ],
           ),
-          backgroundColor: Colors.red.shade600,
+          backgroundColor: AppColors.errorColor,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -135,7 +136,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
             Text('Cart has been cleared'),
           ],
         ),
-        backgroundColor: Colors.blue.shade600,
+        backgroundColor: AppColors.infoColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -165,7 +166,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black26,
+                  color: AppColors.shadowColor,
                   blurRadius: 10,
                   offset: Offset(0, -5),
                 ),
@@ -182,12 +183,12 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                       Container(
                         padding: EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.orange.shade100,
+                          color: AppColors.primaryColor.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.person_add,
-                          color: Colors.orange.shade700,
+                          color: AppColors.primaryColor,
                         ),
                       ),
                       SizedBox(width: 16),
@@ -197,7 +198,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade800,
+                            color: AppColors.textPrimaryColor,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -209,22 +210,22 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                     decoration: InputDecoration(
                       labelText: 'Customer Name',
                       labelStyle: TextStyle(
-                        color: Colors.grey.shade600,
+                        color: AppColors.textSecondaryColor,
                         fontWeight: FontWeight.w500,
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
+                        borderSide: BorderSide(color: AppColors.borderColor),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
+                        borderSide: BorderSide(color: AppColors.borderColor),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.orange.shade500, width: 2),
+                        borderSide: BorderSide(color: AppColors.borderActiveColor, width: 2),
                       ),
-                      prefixIcon: Icon(Icons.person, color: Colors.orange.shade500),
+                      prefixIcon: Icon(Icons.person, color: AppColors.primaryColor),
                       filled: true,
                       fillColor: Colors.grey.shade50,
                       contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
@@ -237,7 +238,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                     ),
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.grey.shade800,
+                      color: AppColors.textPrimaryColor,
                     ),
                   ),
                   SizedBox(height: 20),
@@ -245,22 +246,22 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                     decoration: InputDecoration(
                       labelText: 'Phone Number',
                       labelStyle: TextStyle(
-                        color: Colors.grey.shade600,
+                        color: AppColors.textSecondaryColor,
                         fontWeight: FontWeight.w500,
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
+                        borderSide: BorderSide(color: AppColors.borderColor),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
+                        borderSide: BorderSide(color: AppColors.borderColor),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.orange.shade500, width: 2),
+                        borderSide: BorderSide(color: AppColors.borderActiveColor, width: 2),
                       ),
-                      prefixIcon: Icon(Icons.phone, color: Colors.orange.shade500),
+                      prefixIcon: Icon(Icons.phone, color: AppColors.primaryColor),
                       filled: true,
                       fillColor: Colors.grey.shade50,
                       contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
@@ -274,7 +275,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                     ),
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.grey.shade800,
+                      color: AppColors.textPrimaryColor,
                     ),
                   ),
                   SizedBox(height: 32),
@@ -285,15 +286,6 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                           onPressed: () {
                             Navigator.pop(context);
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange.shade500,
-                            foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 2,
-                          ),
                           child: Text(
                             'Save Details',
                             style: TextStyle(
@@ -328,7 +320,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
               Text('Your cart is empty'),
             ],
           ),
-          backgroundColor: Colors.red.shade600,
+          backgroundColor: AppColors.errorColor,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -352,7 +344,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                 ),
               ],
             ),
-            backgroundColor: Colors.red.shade600,
+            backgroundColor: AppColors.errorColor,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -421,7 +413,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
               ),
             ],
           ),
-          backgroundColor: Colors.red.shade600,
+          backgroundColor: AppColors.errorColor,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -443,15 +435,8 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
     final screenSize = MediaQuery.of(context).size;
     final isSmallScreen = screenSize.width < 360;
     
-    // Create a gradient for the app
-    final mainGradient = LinearGradient(
-      colors: [Colors.orange.shade400, Colors.orange.shade600],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    );
-    
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         title: Text(
           'Shopping Cart',
@@ -461,9 +446,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
           ),
           overflow: TextOverflow.ellipsis,
         ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(gradient: mainGradient),
-        ),
+        backgroundColor: AppColors.primaryColor,
         elevation: 0,
         leading: BackButton(
           onPressed: () {
@@ -477,11 +460,11 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
             Container(
               margin: EdgeInsets.symmetric(horizontal: 8),
               decoration: BoxDecoration(
-                color: Colors.orange.shade50,
+                color: AppColors.primaryColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
-                icon: Icon(Icons.delete_sweep, color: Colors.orange.shade700),
+                icon: Icon(Icons.delete_sweep, color: Colors.white),
                 onPressed: () {
                   showDialog(
                     context: context,
@@ -491,7 +474,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                           children: [
                             Icon(
                               Icons.delete_outline,
-                              color: Colors.red.shade400,
+                              color: AppColors.errorColor,
                             ),
                             SizedBox(width: 12),
                             Expanded(
@@ -505,7 +488,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                         content: Text(
                           'Are you sure you want to remove all items from your cart?',
                           style: TextStyle(
-                            color: Colors.grey.shade700,
+                            color: AppColors.textSecondaryColor,
                             fontSize: 16,
                           ),
                         ),
@@ -517,7 +500,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                             child: Text(
                               'Cancel',
                               style: TextStyle(
-                                color: Colors.grey.shade700,
+                                color: AppColors.textSecondaryColor,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -527,7 +510,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                           ),
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red.shade500,
+                              backgroundColor: AppColors.errorColor,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -562,7 +545,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                 height: double.infinity,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.grey.shade50, Colors.white],
+                    colors: [AppColors.backgroundColor, Colors.white],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                   ),
@@ -575,11 +558,11 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                         Container(
                           padding: EdgeInsets.all(32),
                           decoration: BoxDecoration(
-                            color: Colors.orange.shade50,
+                            color: AppColors.primaryColor.withOpacity(0.1),
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.orange.withOpacity(0.1),
+                                color: AppColors.primaryColor.withOpacity(0.1),
                                 blurRadius: 20,
                                 spreadRadius: 5,
                               ),
@@ -588,7 +571,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                           child: Icon(
                             Icons.shopping_cart_outlined,
                             size: 80,
-                            color: Colors.orange.shade300,
+                            color: AppColors.primaryColor.withOpacity(0.5),
                           ),
                         ),
                         SizedBox(height: 32),
@@ -596,12 +579,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Text(
                             'Your cart is empty',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey.shade800,
-                              letterSpacing: 0.5,
-                            ),
+                            style: AppTheme.pageTitle,
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -612,7 +590,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                             'Add products to start a new sale',
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.grey.shade600,
+                              color: AppColors.textSecondaryColor,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -622,16 +600,6 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                           onPressed: () {
                             Navigator.pop(context);
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange.shade500,
-                            foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            elevation: 3,
-                            shadowColor: Colors.orange.shade200,
-                          ),
                           icon: Icon(Icons.add_shopping_cart),
                           label: Text(
                             'Continue Shopping',
@@ -654,7 +622,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                   height: double.infinity,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Colors.grey.shade50, Colors.white],
+                      colors: [AppColors.backgroundColor, Colors.white],
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                     ),
@@ -666,14 +634,14 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                         margin: EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [Colors.orange.shade300, Colors.orange.shade400],
+                            colors: [AppColors.secondaryColor, AppColors.tertiaryColor],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.orange.withOpacity(0.2),
+                              color: AppColors.shadowColor,
                               blurRadius: 12,
                               offset: Offset(0, 5),
                             ),
@@ -812,7 +780,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                     margin: EdgeInsets.only(bottom: 16),
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
-                                        colors: [Colors.red.shade400, Colors.red.shade600],
+                                        colors: [AppColors.errorColor.withOpacity(0.7), AppColors.errorColor],
                                         begin: Alignment.centerLeft,
                                         end: Alignment.centerRight,
                                       ),
@@ -843,17 +811,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                   },
                                   child: Container(
                                     margin: EdgeInsets.only(bottom: 16),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(16),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.05),
-                                          blurRadius: 10,
-                                          offset: Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
+                                    decoration: AppTheme.cardDecoration,
                                     child: Padding(
                                       padding: EdgeInsets.symmetric(
                                         horizontal: isSmallScreen ? 12.0 : 16.0, 
@@ -870,7 +828,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                                 height: isSmallScreen ? 50 : 60,
                                                 decoration: BoxDecoration(
                                                   gradient: LinearGradient(
-                                                    colors: [Colors.orange.shade100, Colors.orange.shade200],
+                                                    colors: [AppColors.primaryColor.withOpacity(0.1), AppColors.secondaryColor.withOpacity(0.2)],
                                                     begin: Alignment.topLeft,
                                                     end: Alignment.bottomRight,
                                                   ),
@@ -878,7 +836,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                                 ),
                                                 child: Icon(
                                                   Icons.inventory_2,
-                                                  color: Colors.orange.shade700,
+                                                  color: AppColors.primaryColor,
                                                   size: isSmallScreen ? 25 : 30,
                                                 ),
                                               ),
@@ -892,11 +850,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                                     // Product name with overflow handling
                                                     Text(
                                                       item.name,
-                                                      style: TextStyle(
-                                                        fontWeight: FontWeight.bold,
-                                                        fontSize: isSmallScreen ? 14 : 16,
-                                                        color: Colors.grey.shade800,
-                                                      ),
+                                                      style: AppTheme.cardTitle,
                                                       maxLines: 2,
                                                       overflow: TextOverflow.ellipsis,
                                                     ),
@@ -924,7 +878,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                                             item.categoryName,
                                                             style: TextStyle(
                                                               fontSize: 10,
-                                                              color: Colors.grey.shade700,
+                                                              color: AppColors.textSecondaryColor,
                                                               fontWeight: FontWeight.w500,
                                                             ),
                                                             maxLines: 1,
@@ -938,10 +892,10 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                                               vertical: 3,
                                                             ),
                                                             decoration: BoxDecoration(
-                                                              color: Colors.blue.shade50,
+                                                              color: AppColors.infoColor.withOpacity(0.1),
                                                               borderRadius: BorderRadius.circular(6),
                                                               border: Border.all(
-                                                                color: Colors.blue.shade100,
+                                                                color: AppColors.infoColor.withOpacity(0.3),
                                                                 width: 1,
                                                               ),
                                                             ),
@@ -951,7 +905,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                                                 Icon(
                                                                   Icons.tag,
                                                                   size: 10,
-                                                                  color: Colors.blue.shade700,
+                                                                  color: AppColors.infoColor,
                                                                 ),
                                                                 SizedBox(width: 4),
                                                                 Flexible(
@@ -959,7 +913,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                                                     item.serialNumber!,
                                                                     style: TextStyle(
                                                                       fontSize: 10,
-                                                                      color: Colors.blue.shade700,
+                                                                      color: AppColors.infoColor,
                                                                       fontWeight: FontWeight.w500,
                                                                     ),
                                                                     maxLines: 1,
@@ -992,7 +946,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                                         Text(
                                                           '${widget.currencySymbol} ',
                                                           style: TextStyle(
-                                                            color: Colors.grey.shade600,
+                                                            color: AppColors.textSecondaryColor,
                                                             fontSize: 14,
                                                           ),
                                                         ),
@@ -1000,14 +954,14 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                                           '${item.price.toStringAsFixed(2)}',
                                                           style: TextStyle(
                                                             fontWeight: FontWeight.w600,
-                                                            color: Colors.orange.shade700,
+                                                            color: AppColors.primaryColor,
                                                             fontSize: 16,
                                                           ),
                                                         ),
                                                         Text(
                                                           ' × ',
                                                           style: TextStyle(
-                                                            color: Colors.grey.shade500,
+                                                            color: AppColors.textSecondaryColor,
                                                             fontSize: 16,
                                                           ),
                                                         ),
@@ -1029,7 +983,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                                               'Total',
                                                               style: TextStyle(
                                                                 fontSize: 10,
-                                                                color: Colors.grey.shade500,
+                                                                color: AppColors.textSecondaryColor,
                                                               ),
                                                             ),
                                                             SizedBox(height: 2),
@@ -1038,7 +992,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                                               style: TextStyle(
                                                                 fontWeight: FontWeight.bold,
                                                                 fontSize: 14,
-                                                                color: Colors.orange.shade700,
+                                                                color: AppColors.primaryColor,
                                                               ),
                                                             ),
                                                           ],
@@ -1056,7 +1010,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                                   Text(
                                                     '${widget.currencySymbol} ',
                                                     style: TextStyle(
-                                                      color: Colors.grey.shade600,
+                                                      color: AppColors.textSecondaryColor,
                                                       fontSize: 14,
                                                     ),
                                                   ),
@@ -1064,14 +1018,14 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                                     '${item.price.toStringAsFixed(2)}',
                                                     style: TextStyle(
                                                       fontWeight: FontWeight.w600,
-                                                      color: Colors.orange.shade700,
+                                                      color: AppColors.primaryColor,
                                                       fontSize: 16,
                                                     ),
                                                   ),
                                                   Text(
                                                     ' × ',
                                                     style: TextStyle(
-                                                      color: Colors.grey.shade500,
+                                                      color: AppColors.textSecondaryColor,
                                                       fontSize: 16,
                                                     ),
                                                   ),
@@ -1089,7 +1043,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                                         'Item Total',
                                                         style: TextStyle(
                                                           fontSize: 10,
-                                                          color: Colors.grey.shade500,
+                                                          color: AppColors.textSecondaryColor,
                                                         ),
                                                       ),
                                                       SizedBox(height: 2),
@@ -1098,7 +1052,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                                         style: TextStyle(
                                                           fontWeight: FontWeight.bold,
                                                           fontSize: isSmallScreen ? 14 : 16,
-                                                          color: Colors.orange.shade700,
+                                                          color: AppColors.primaryColor,
                                                         ),
                                                       ),
                                                     ],
@@ -1125,7 +1079,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                           color: Colors.white,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: AppColors.shadowColor,
                               offset: Offset(0, -4),
                               blurRadius: 10,
                             ),
@@ -1146,7 +1100,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                   Icon(
                                     Icons.payment,
                                     size: 18,
-                                    color: Colors.grey.shade700,
+                                    color: AppColors.textSecondaryColor,
                                   ),
                                   SizedBox(width: 8),
                                   Expanded(
@@ -1155,7 +1109,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.grey.shade800,
+                                        color: AppColors.textPrimaryColor,
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -1200,12 +1154,12 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                 padding: EdgeInsets.all(16),
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
-                                    colors: [Colors.orange.shade50, Colors.orange.shade100],
+                                    colors: [AppColors.primaryColor.withOpacity(0.05), AppColors.secondaryColor.withOpacity(0.1)],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                   ),
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.orange.shade200),
+                                  border: Border.all(color: AppColors.secondaryColor.withOpacity(0.2)),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1215,14 +1169,14 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                         Icon(
                                           Icons.person,
                                           size: 16,
-                                          color: Colors.orange.shade800,
+                                          color: AppColors.primaryColor,
                                         ),
                                         SizedBox(width: 8),
                                         Text(
                                           'Customer: ',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.orange.shade800,
+                                            color: AppColors.primaryColor,
                                           ),
                                         ),
                                         Expanded(
@@ -1231,7 +1185,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                                 ? 'Not specified'
                                                 : _customerDetails['name']!,
                                             style: TextStyle(
-                                              color: Colors.orange.shade800,
+                                              color: AppColors.primaryColor,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -1241,13 +1195,13 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                           icon: Container(
                                             padding: EdgeInsets.all(4),
                                             decoration: BoxDecoration(
-                                              color: Colors.orange.shade200,
+                                              color: AppColors.secondaryColor.withOpacity(0.2),
                                               shape: BoxShape.circle,
                                             ),
                                             child: Icon(
                                               Icons.edit,
                                               size: 12,
-                                              color: Colors.orange.shade800,
+                                              color: AppColors.primaryColor,
                                             ),
                                           ),
                                           constraints: BoxConstraints(),
@@ -1262,14 +1216,14 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                         Icon(
                                           Icons.phone,
                                           size: 16,
-                                          color: Colors.orange.shade800,
+                                          color: AppColors.primaryColor,
                                         ),
                                         SizedBox(width: 8),
                                         Text(
                                           'Phone: ',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.orange.shade800,
+                                            color: AppColors.primaryColor,
                                           ),
                                         ),
                                         Expanded(
@@ -1278,7 +1232,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                                 ? 'Not specified'
                                                 : _customerDetails['phone']!,
                                             style: TextStyle(
-                                              color: Colors.orange.shade800,
+                                              color: AppColors.primaryColor,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -1299,16 +1253,6 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                               height: 56,
                               child: ElevatedButton(
                                 onPressed: _isProcessingSale ? null : _processSale,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orange.shade500,
-                                  foregroundColor: Colors.white,
-                                  disabledBackgroundColor: Colors.grey.shade300,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  elevation: 3,
-                                  shadowColor: Colors.orange.shade200,
-                                ),
                                 child: _isProcessingSale
                                     ? SizedBox(
                                         width: 24,
@@ -1340,7 +1284,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Colors.grey.shade300,
+          color: AppColors.borderColor,
           width: 1,
         ),
         color: Colors.white,
@@ -1371,7 +1315,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                 child: Icon(
                   Icons.remove,
                   size: 16,
-                  color: Colors.grey.shade700,
+                  color: AppColors.textSecondaryColor,
                 ),
               ),
             ),
@@ -1384,8 +1328,8 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
             ),
             decoration: BoxDecoration(
               border: Border(
-                left: BorderSide(color: Colors.grey.shade300),
-                right: BorderSide(color: Colors.grey.shade300),
+                left: BorderSide(color: AppColors.borderColor),
+                right: BorderSide(color: AppColors.borderColor),
               ),
             ),
             child: Text(
@@ -1393,7 +1337,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
-                color: Colors.grey.shade800,
+                color: AppColors.textPrimaryColor,
               ),
               textAlign: TextAlign.center,
             ),
@@ -1422,7 +1366,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                 child: Icon(
                   Icons.add,
                   size: 16,
-                  color: Colors.grey.shade700,
+                  color: AppColors.textSecondaryColor,
                 ),
               ),
             ),
@@ -1449,13 +1393,13 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
         decoration: BoxDecoration(
           border: Border.all(
             color: _paymentMethod == method
-                ? Colors.orange.shade500
-                : Colors.grey.shade300,
+                ? AppColors.secondaryColor
+                : AppColors.borderColor,
             width: 2,
           ),
           borderRadius: BorderRadius.circular(12),
           color: _paymentMethod == method
-              ? Colors.orange.shade50
+              ? AppColors.secondaryColor.withOpacity(0.05)
               : Colors.white,
         ),
         child: Column(
@@ -1464,7 +1408,7 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: _paymentMethod == method
-                    ? Colors.orange.shade100
+                    ? AppColors.secondaryColor.withOpacity(0.1)
                     : Colors.grey.shade100,
                 shape: BoxShape.circle,
               ),
@@ -1472,8 +1416,8 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                 icon,
                 size: 24,
                 color: _paymentMethod == method
-                    ? Colors.orange.shade500
-                    : Colors.grey.shade600,
+                    ? AppColors.secondaryColor
+                    : AppColors.textSecondaryColor,
               ),
             ),
             SizedBox(height: 8),
@@ -1482,8 +1426,8 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: _paymentMethod == method
-                    ? Colors.orange.shade500
-                    : Colors.grey.shade600,
+                    ? AppColors.secondaryColor
+                    : AppColors.textSecondaryColor,
                 fontSize: 14,
               ),
               textAlign: TextAlign.center,

@@ -4,6 +4,7 @@ import 'dart:convert';
 import '../../services/auth_service.dart';
 import '../../models/user.dart';
 import '../../config/api_config.dart';
+import '../../theme/app_theme.dart'; // Import the AppTheme
 
 class UserManagementScreen extends StatefulWidget {
   const UserManagementScreen({Key? key}) : super(key: key);
@@ -84,7 +85,13 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Add New User'),
+        title: Text(
+          'Add New User',
+          style: TextStyle(
+            fontWeight: FontWeight.bold, 
+            color: AppColors.textPrimaryColor,
+          ),
+        ),
         content: SingleChildScrollView(
           child: Form(
             key: _formKey,
@@ -93,9 +100,16 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               children: [
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Full Name',
-                    prefixIcon: Icon(Icons.person),
+                    prefixIcon: Icon(Icons.person, color: AppColors.primaryColor),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -108,9 +122,16 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Email',
-                    prefixIcon: Icon(Icons.email),
+                    prefixIcon: Icon(Icons.email, color: AppColors.primaryColor),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -126,9 +147,16 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Password',
-                    prefixIcon: Icon(Icons.lock),
+                    prefixIcon: Icon(Icons.lock, color: AppColors.primaryColor),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -144,9 +172,16 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: true,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Confirm Password',
-                    prefixIcon: Icon(Icons.lock_outline),
+                    prefixIcon: Icon(Icons.lock_outline, color: AppColors.primaryColor),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -161,18 +196,25 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: _selectedRole,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Role',
-                    prefixIcon: Icon(Icons.assignment_ind),
+                    prefixIcon: Icon(Icons.assignment_ind, color: AppColors.primaryColor),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                    ),
                   ),
-                  items: const [
+                  items: [
                     DropdownMenuItem(
                       value: 'cashier',
-                      child: Text('Cashier'),
+                      child: Text('Cashier', style: TextStyle(color: AppColors.textPrimaryColor)),
                     ),
                     DropdownMenuItem(
                       value: 'admin',
-                      child: Text('Admin'),
+                      child: Text('Admin', style: TextStyle(color: AppColors.textPrimaryColor)),
                     ),
                   ],
                   onChanged: (value) {
@@ -188,18 +230,18 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: TextStyle(color: AppColors.textSecondaryColor)),
           ),
           _isCreatingUser
-              ? const CircularProgressIndicator()
+              ? CircularProgressIndicator(color: AppColors.primaryColor)
               : ElevatedButton(
                   onPressed: _createUser,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange.shade500,
-                  ),
                   child: const Text('Add User'),
                 ),
         ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
       ),
     );
   }
@@ -238,15 +280,17 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('User ${user.name} created successfully'),
-              backgroundColor: Colors.green,
+              backgroundColor: AppColors.successColor,
+              behavior: SnackBarBehavior.floating,
             ),
           );
         } else {
           // Show error
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text('Failed to create user'),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.errorColor,
+              behavior: SnackBarBehavior.floating,
             ),
           );
         }
@@ -258,7 +302,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.errorColor,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -268,18 +313,92 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        title: const Text('User Management'),
-        backgroundColor: Colors.orange.shade500,
+        title: const Text(
+          'User Management',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: AppColors.primaryColor,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator(color: AppColors.primaryColor))
           : _errorMessage != null
-              ? Center(child: Text(_errorMessage!))
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: AppColors.errorColor,
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        'Error',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.errorColor,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                        child: Text(
+                          _errorMessage!,
+                          style: TextStyle(
+                            color: AppColors.textSecondaryColor,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: _loadUsers,
+                        icon: Icon(Icons.refresh),
+                        label: Text('Try Again'),
+                      ),
+                    ],
+                  ),
+                )
               : RefreshIndicator(
                   onRefresh: _loadUsers,
+                  color: AppColors.primaryColor,
                   child: _users.isEmpty
-                      ? const Center(child: Text('No users found'))
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.people_outline,
+                                size: 80,
+                                color: AppColors.textTertiaryColor,
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                'No users found',
+                                style: AppTheme.sectionTitle,
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Add a new user to get started',
+                                style: TextStyle(
+                                  color: AppColors.textSecondaryColor,
+                                ),
+                              ),
+                              SizedBox(height: 24),
+                              ElevatedButton.icon(
+                                onPressed: _showAddUserDialog,
+                                icon: Icon(Icons.add),
+                                label: Text('Add User'),
+                              ),
+                            ],
+                          ),
+                        )
                       : ListView.builder(
                           itemCount: _users.length,
                           itemBuilder: (context, index) {
@@ -289,33 +408,48 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                                 horizontal: 16,
                                 vertical: 8,
                               ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 2,
+                              shadowColor: AppColors.shadowColor,
                               child: ListTile(
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
                                 leading: CircleAvatar(
                                   backgroundColor: user.isAdmin()
-                                      ? Colors.purple.shade100
-                                      : Colors.orange.shade100,
+                                      ? AppColors.tertiaryColor.withOpacity(0.2)
+                                      : AppColors.primaryColor.withOpacity(0.2),
                                   child: Icon(
                                     Icons.person,
                                     color: user.isAdmin()
-                                        ? Colors.purple
-                                        : Colors.orange,
+                                        ? AppColors.tertiaryColor
+                                        : AppColors.primaryColor,
                                   ),
                                 ),
-                                title: Text(user.name),
-                                subtitle: Text(user.email),
+                                title: Text(
+                                  user.name,
+                                  style: AppTheme.cardTitle,
+                                ),
+                                subtitle: Text(
+                                  user.email,
+                                  style: AppTheme.cardSubtitle,
+                                ),
                                 trailing: Chip(
                                   label: Text(
                                     user.role.toUpperCase(),
                                     style: TextStyle(
-                                      color: user.isAdmin()
-                                          ? Colors.white
-                                          : Colors.white,
+                                      color: Colors.white,
                                       fontSize: 12,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   backgroundColor: user.isAdmin()
-                                      ? Colors.purple
-                                      : Colors.orange,
+                                      ? AppColors.tertiaryColor
+                                      : AppColors.primaryColor,
+                                  padding: EdgeInsets.symmetric(horizontal: 8),
                                 ),
                               ),
                             );
@@ -324,7 +458,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddUserDialog,
-        backgroundColor: Colors.orange.shade500,
+        backgroundColor: AppColors.secondaryColor,
         child: const Icon(Icons.add),
         tooltip: 'Add User',
       ),

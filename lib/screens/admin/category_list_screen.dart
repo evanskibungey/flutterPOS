@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/category_service.dart';
 import '../../models/category.dart';
+import '../../theme/app_theme.dart'; // Import the AppTheme
 import 'category_form_screen.dart';
 
 class CategoryListScreen extends StatefulWidget {
@@ -117,19 +118,34 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Category'),
-        content: Text('Are you sure you want to delete "${category.name}"? This cannot be undone.'),
+        title: const Text(
+          'Delete Category',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimaryColor,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete "${category.name}"? This cannot be undone.',
+          style: TextStyle(color: AppColors.textSecondaryColor),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('CANCEL'),
+            child: Text(
+              'CANCEL',
+              style: TextStyle(color: AppColors.textSecondaryColor),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: AppColors.errorColor),
             child: const Text('DELETE'),
           ),
         ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
       ),
     );
 
@@ -140,9 +156,10 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
         
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Category deleted successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.successColor,
+            behavior: SnackBarBehavior.floating,
           ),
         );
         
@@ -153,7 +170,8 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString()),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.errorColor,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -163,9 +181,16 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        title: const Text('Categories'),
-        backgroundColor: Colors.orange.shade500,
+        title: const Text(
+          'Categories',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: AppColors.primaryColor,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -186,9 +211,10 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                   controller: _searchController,
                   decoration: InputDecoration(
                     hintText: 'Search categories...',
-                    prefixIcon: const Icon(Icons.search),
+                    hintStyle: TextStyle(color: AppColors.textTertiaryColor),
+                    prefixIcon: Icon(Icons.search, color: AppColors.primaryColor),
                     suffixIcon: IconButton(
-                      icon: const Icon(Icons.clear),
+                      icon: Icon(Icons.clear, color: AppColors.textTertiaryColor),
                       onPressed: () {
                         _searchController.clear();
                         _handleSearch();
@@ -197,7 +223,14 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
+                  style: TextStyle(color: AppColors.textPrimaryColor),
                   onSubmitted: (_) => _handleSearch(),
                 ),
                 const SizedBox(height: 16),
@@ -210,27 +243,39 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                       child: DropdownButtonFormField<String?>(
                         decoration: InputDecoration(
                           labelText: 'Status',
+                          labelStyle: TextStyle(color: AppColors.textSecondaryColor),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: AppColors.borderColor),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                          ),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          filled: true,
+                          fillColor: Colors.white,
                         ),
                         value: _statusFilter,
                         items: [
-                          const DropdownMenuItem<String?>(
+                          DropdownMenuItem<String?>(
                             value: null,
-                            child: Text('All'),
+                            child: Text('All', style: TextStyle(color: AppColors.textPrimaryColor)),
                           ),
-                          const DropdownMenuItem<String>(
+                          DropdownMenuItem<String>(
                             value: 'active',
-                            child: Text('Active'),
+                            child: Text('Active', style: TextStyle(color: AppColors.textPrimaryColor)),
                           ),
-                          const DropdownMenuItem<String>(
+                          DropdownMenuItem<String>(
                             value: 'inactive',
-                            child: Text('Inactive'),
+                            child: Text('Inactive', style: TextStyle(color: AppColors.textPrimaryColor)),
                           ),
                         ],
                         onChanged: _handleStatusFilterChange,
+                        dropdownColor: Colors.white,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -240,20 +285,31 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                       child: DropdownButtonFormField<String>(
                         decoration: InputDecoration(
                           labelText: 'Sort By',
+                          labelStyle: TextStyle(color: AppColors.textSecondaryColor),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: AppColors.borderColor),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                          ),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          filled: true,
+                          fillColor: Colors.white,
                         ),
                         value: _sortBy,
-                        items: const [
+                        items: [
                           DropdownMenuItem<String>(
                             value: 'name',
-                            child: Text('Name'),
+                            child: Text('Name', style: TextStyle(color: AppColors.textPrimaryColor)),
                           ),
                           DropdownMenuItem<String>(
                             value: 'created_at',
-                            child: Text('Newest'),
+                            child: Text('Newest', style: TextStyle(color: AppColors.textPrimaryColor)),
                           ),
                         ],
                         onChanged: (value) {
@@ -261,6 +317,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                             _handleSortChange(value);
                           }
                         },
+                        dropdownColor: Colors.white,
                       ),
                     ),
                   ],
@@ -279,7 +336,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                   'Total: $_totalItems categories',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey.shade700,
+                    color: AppColors.textPrimaryColor,
                   ),
                 ),
                 // Pagination info
@@ -287,7 +344,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                   Text(
                     'Page $_currentPage of $_lastPage',
                     style: TextStyle(
-                      color: Colors.grey.shade600,
+                      color: AppColors.textSecondaryColor,
                     ),
                   ),
               ],
@@ -297,13 +354,80 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
           // Main content - category list or loading indicator
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(child: CircularProgressIndicator(color: AppColors.primaryColor))
                 : _errorMessage != null
-                    ? Center(child: Text(_errorMessage!))
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              size: 64,
+                              color: AppColors.errorColor,
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              'Error',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.errorColor,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                              child: Text(
+                                _errorMessage!,
+                                style: TextStyle(
+                                  color: AppColors.textSecondaryColor,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            SizedBox(height: 24),
+                            ElevatedButton.icon(
+                              onPressed: _loadCategories,
+                              icon: Icon(Icons.refresh),
+                              label: Text('Try Again'),
+                            ),
+                          ],
+                        ),
+                      )
                     : _categories.isEmpty
-                        ? const Center(child: Text('No categories found'))
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.category_outlined,
+                                  size: 80,
+                                  color: AppColors.textTertiaryColor,
+                                ),
+                                SizedBox(height: 16),
+                                Text(
+                                  'No categories found',
+                                  style: AppTheme.sectionTitle,
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Try a different search or add a new category',
+                                  style: TextStyle(
+                                    color: AppColors.textSecondaryColor,
+                                  ),
+                                ),
+                                SizedBox(height: 24),
+                                ElevatedButton.icon(
+                                  onPressed: _addCategory,
+                                  icon: Icon(Icons.add),
+                                  label: Text('Add Category'),
+                                ),
+                              ],
+                            ),
+                          )
                         : RefreshIndicator(
                             onRefresh: _loadCategories,
+                            color: AppColors.primaryColor,
                             child: ListView.builder(
                               itemCount: _categories.length,
                               itemBuilder: (context, index) {
@@ -313,15 +437,17 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
+                                  elevation: 2,
+                                  shadowColor: AppColors.shadowColor,
                                   child: ListTile(
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                     title: Text(
                                       category.name,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      style: AppTheme.cardTitle,
                                     ),
                                     subtitle: Text(
                                       category.description ?? 'No description',
+                                      style: AppTheme.cardSubtitle,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -335,12 +461,12 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                                             style: TextStyle(
                                               color: category.status == 'active'
                                                   ? Colors.white
-                                                  : Colors.grey.shade700,
+                                                  : AppColors.textSecondaryColor,
                                               fontSize: 12,
                                             ),
                                           ),
                                           backgroundColor: category.status == 'active'
-                                              ? Colors.green
+                                              ? AppColors.successColor
                                               : Colors.grey.shade300,
                                           padding: EdgeInsets.zero,
                                         ),
@@ -350,11 +476,12 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                                         Chip(
                                           label: Text(
                                             '${category.productsCount} products',
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 12,
+                                              color: Colors.white,
                                             ),
                                           ),
-                                          backgroundColor: Colors.blue.shade100,
+                                          backgroundColor: AppColors.infoColor,
                                           padding: EdgeInsets.zero,
                                         ),
                                         
@@ -362,14 +489,14 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                                         IconButton(
                                           icon: const Icon(Icons.edit),
                                           onPressed: () => _editCategory(category),
-                                          color: Colors.blue,
+                                          color: AppColors.infoColor,
                                         ),
                                         
                                         // Delete button
                                         IconButton(
                                           icon: const Icon(Icons.delete),
                                           onPressed: () => _deleteCategory(category),
-                                          color: Colors.red,
+                                          color: AppColors.errorColor,
                                         ),
                                       ],
                                     ),
@@ -382,13 +509,22 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
           
           // Pagination controls
           if (!_isLoading && _lastPage > 1)
-            Padding(
+            Container(
               padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.shadowColor,
+                    blurRadius: 4,
+                    offset: Offset(0, -2),
+                  ),
+                ],
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.chevron_left),
+                  ElevatedButton(
                     onPressed: _currentPage > 1
                         ? () {
                             setState(() {
@@ -397,10 +533,27 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                             _loadCategories();
                           }
                         : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: AppColors.primaryColor,
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(color: AppColors.primaryColor),
+                      ),
+                    ),
+                    child: Icon(Icons.chevron_left),
                   ),
-                  Text('$_currentPage / $_lastPage'),
-                  IconButton(
-                    icon: const Icon(Icons.chevron_right),
+                  SizedBox(width: 16),
+                  Text(
+                    'Page $_currentPage of $_lastPage',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimaryColor,
+                    ),
+                  ),
+                  SizedBox(width: 16),
+                  ElevatedButton(
                     onPressed: _currentPage < _lastPage
                         ? () {
                             setState(() {
@@ -409,6 +562,16 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                             _loadCategories();
                           }
                         : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: AppColors.primaryColor,
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(color: AppColors.primaryColor),
+                      ),
+                    ),
+                    child: Icon(Icons.chevron_right),
                   ),
                 ],
               ),
@@ -417,7 +580,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addCategory,
-        backgroundColor: Colors.orange.shade500,
+        backgroundColor: AppColors.secondaryColor,
         child: const Icon(Icons.add),
         tooltip: 'Add Category',
       ),
