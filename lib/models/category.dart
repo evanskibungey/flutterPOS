@@ -22,14 +22,29 @@ class Category {
   // Create a Category from JSON
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
-      id: json['id'],
-      name: json['name'],
+      id: _parseInt(json['id']),
+      name: json['name'] ?? '',
       description: json['description'],
       status: json['status'] ?? 'active',
-      productsCount: json['products_count'],
+      productsCount: _parseInt(json['products_count']),
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
     );
+  }
+
+  // Helper method to safely parse values to int
+  static int _parseInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is double) return value.round();
+    if (value is String) {
+      try {
+        return int.parse(value);
+      } catch (e) {
+        return 0;
+      }
+    }
+    return 0;
   }
 
   // Convert Category to JSON

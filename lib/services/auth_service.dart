@@ -12,47 +12,68 @@ class AuthService {
   // Login using Laravel Sanctum authentication
   Future<User?> login(String email, String password) async {
     try {
-      // Get CSRF token first (Laravel requires this)
-      final csrfResponse = await http.get(Uri.parse('${ApiConfig.baseUrl}/sanctum/csrf-cookie'));
+      print('Attempting login for: $email');
+      print('Using API endpoint: ${ApiConfig.baseUrl}/api/login');
+      print('Request headers: {"Content-Type": "application/json", "Accept": "application/json"}');
+      print('Request body: {"email": "$email", "password": "[HIDDEN]"}');
       
-      // Extract CSRF token from cookies if needed
-      // This depends on how your Laravel backend is configured
-      
-      // Perform login
+      // Perform login directly without CSRF token (not needed for API authentication)
       final response = await http.post(
         Uri.parse('${ApiConfig.baseUrl}/api/login'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          // Add CSRF token if needed
         },
         body: jsonEncode({
           'email': email,
           'password': password,
         }),
-      );
+      ).timeout(const Duration(seconds: 30));
+      
+      print('Login response status: ${response.statusCode}');
+      print('Login response body: ${response.body}');
       
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         
-        // Save the token
-        await storage.write(key: 'auth_token', value: data['token']);
+        if (data.containsKey('token') && data['token'] != null) {
+          // Save the token
+          await storage.write(key: 'auth_token', value: data['token']);
+          
+          // Save user data
+          await storage.write(key: 'user', value: jsonEncode(data['user']));
+          
+          // Update in-memory state
+          _currentUser = User.fromJson(data['user']);
+          _isAuthenticated = true;
+          
+          print('Login successful for user: ${_currentUser?.name}');
+          return _currentUser;
+        } else {
+          throw Exception(data['message'] ?? 'Login failed - no token received');
+        }
+      } else if (response.statusCode == 422) {
+        // Validation errors
+        final errorData = jsonDecode(response.body);
+        String errorMessage = 'Login failed';
         
-        // Save user data
-        await storage.write(key: 'user', value: jsonEncode(data['user']));
+        if (errorData.containsKey('errors')) {
+          final errors = errorData['errors'];
+          if (errors.containsKey('email')) {
+            errorMessage = errors['email'][0];
+          }
+        } else if (errorData.containsKey('message')) {
+          errorMessage = errorData['message'];
+        }
         
-        // Update in-memory state
-        _currentUser = User.fromJson(data['user']);
-        _isAuthenticated = true;
-        
-        return _currentUser;
+        throw Exception(errorMessage);
       } else {
-        // Handle errors
-        throw Exception('Failed to login: ${response.body}');
+        // Other HTTP errors
+        throw Exception('Login failed with status ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
       print('Login error: $e');
-      return null;
+      rethrow; // Re-throw the exception so the UI can handle it
     }
   }
   

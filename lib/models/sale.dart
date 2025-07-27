@@ -39,23 +39,66 @@ class Sale {
 
   factory Sale.fromJson(Map<String, dynamic> json) {
     return Sale(
-      id: json['id'] ?? 0,
-      userId: json['user_id'] ?? 0,
-      customerId: json['customer_id'], // Allow null
-      receiptNumber: json['receipt_number'] ?? '',
-      totalAmount: double.tryParse(json['total_amount']?.toString() ?? '0') ?? 0.0,
-      paymentMethod: json['payment_method'] ?? '',
-      paymentStatus: json['payment_status'] ?? '',
-      status: json['status'] ?? '',
-      notes: json['notes'],
-      createdAt: json['created_at'] ?? '',
-      updatedAt: json['updated_at'] ?? '',
+      id: _parseInt(json['id']),
+      userId: _parseInt(json['user_id']),
+      customerId: _parseIntNullable(json['customer_id']),
+      receiptNumber: json['receipt_number']?.toString() ?? '',
+      totalAmount: _parseDouble(json['total_amount']),
+      paymentMethod: json['payment_method']?.toString() ?? '',
+      paymentStatus: json['payment_status']?.toString() ?? '',
+      status: json['status']?.toString() ?? '',
+      notes: json['notes']?.toString(),
+      createdAt: json['created_at']?.toString() ?? '',
+      updatedAt: json['updated_at']?.toString() ?? '',
       customer: json['customer'] != null ? Customer.fromJson(json['customer']) : null,
       user: json['user'] != null ? User.fromJson(json['user']) : null,
       items: json['items'] != null
           ? List<SaleItem>.from(json['items'].map((item) => SaleItem.fromJson(item)))
           : null,
     );
+  }
+
+  // Helper methods to safely parse values
+  static int _parseInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is double) return value.round();
+    if (value is String) {
+      try {
+        return int.parse(value);
+      } catch (e) {
+        return 0;
+      }
+    }
+    return 0;
+  }
+
+  static int? _parseIntNullable(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is double) return value.round();
+    if (value is String) {
+      try {
+        return int.parse(value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) {
+      try {
+        return double.parse(value);
+      } catch (e) {
+        return 0.0;
+      }
+    }
+    return 0.0;
   }
 
   Map<String, dynamic> toJson() {
@@ -106,15 +149,15 @@ class SaleItem {
 
   factory SaleItem.fromJson(Map<String, dynamic> json) {
     return SaleItem(
-      id: json['id'] ?? 0,
-      saleId: json['sale_id'] ?? 0,
-      productId: json['product_id'] ?? 0,
-      quantity: json['quantity'] ?? 0,
-      unitPrice: double.tryParse(json['unit_price']?.toString() ?? '0') ?? 0.0,
-      subtotal: double.tryParse(json['subtotal']?.toString() ?? '0') ?? 0.0,
-      serialNumber: json['serial_number'],
-      createdAt: json['created_at'] ?? '',
-      updatedAt: json['updated_at'] ?? '',
+      id: Sale._parseInt(json['id']),
+      saleId: Sale._parseInt(json['sale_id']),
+      productId: Sale._parseInt(json['product_id']),
+      quantity: Sale._parseInt(json['quantity']),
+      unitPrice: Sale._parseDouble(json['unit_price']),
+      subtotal: Sale._parseDouble(json['subtotal']),
+      serialNumber: json['serial_number']?.toString(),
+      createdAt: json['created_at']?.toString() ?? '',
+      updatedAt: json['updated_at']?.toString() ?? '',
       product: json['product'] != null ? Product.fromJson(json['product']) : null,
     );
   }
@@ -159,14 +202,14 @@ class Customer {
 
   factory Customer.fromJson(Map<String, dynamic> json) {
     return Customer(
-      id: json['id'],
-      name: json['name'],
-      phone: json['phone'],
-      email: json['email'],
-      status: json['status'],
-      balance: json['balance'] != null ? double.parse(json['balance'].toString()) : null,
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
+      id: Sale._parseInt(json['id']),
+      name: json['name']?.toString() ?? '',
+      phone: json['phone']?.toString() ?? '',
+      email: json['email']?.toString(),
+      status: json['status']?.toString() ?? 'active',
+      balance: json['balance'] != null ? Sale._parseDouble(json['balance']) : null,
+      createdAt: json['created_at']?.toString() ?? '',
+      updatedAt: json['updated_at']?.toString() ?? '',
     );
   }
 

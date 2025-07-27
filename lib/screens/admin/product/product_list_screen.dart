@@ -66,12 +66,19 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Future<void> _loadCategories() async {
     try {
       final result = await _categoryService.getCategories(status: 'active');
-      setState(() {
-        _categories = result['categories'];
-      });
+      if (mounted) {
+        setState(() {
+          _categories = result['categories'] ?? [];
+        });
+      }
     } catch (e) {
       print('Error loading categories: $e');
-      // Don't set error message, as this is a secondary functionality
+      // Set empty categories list to prevent dropdown errors
+      if (mounted) {
+        setState(() {
+          _categories = [];
+        });
+      }
     }
   }
 
@@ -333,6 +340,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   children: [
                     // Category filter
                     Expanded(
+                      flex: 2,
                       child: DropdownButtonFormField<int?>(
                         decoration: InputDecoration(
                           labelText: 'Category',
@@ -340,21 +348,26 @@ class _ProductListScreenState extends State<ProductListScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
+                            horizontal: 12,
                             vertical: 8,
                           ),
                         ),
                         value: _categoryFilter,
+                        isExpanded: true, // Prevent overflow
                         items: [
                           const DropdownMenuItem<int?>(
                             value: null,
-                            child: Text('All Categories'),
+                            child: Text('All Categories', overflow: TextOverflow.ellipsis),
                           ),
                           ..._categories
                               .map(
                                 (category) => DropdownMenuItem<int>(
                                   value: category.id,
-                                  child: Text(category.name),
+                                  child: Text(
+                                    category.name,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
                                 ),
                               )
                               .toList(),
@@ -362,10 +375,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
                         onChanged: _handleCategoryFilterChange,
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 12),
 
                     // Status filter
                     Expanded(
+                      flex: 1,
                       child: DropdownButtonFormField<String?>(
                         decoration: InputDecoration(
                           labelText: 'Status',
@@ -373,11 +387,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
+                            horizontal: 12,
                             vertical: 8,
                           ),
                         ),
                         value: _statusFilter,
+                        isExpanded: true, // Prevent overflow
                         items: [
                           const DropdownMenuItem<String?>(
                             value: null,
@@ -404,6 +419,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   children: [
                     // Stock status filter
                     Expanded(
+                      flex: 1,
                       child: DropdownButtonFormField<String?>(
                         decoration: InputDecoration(
                           labelText: 'Stock',
@@ -411,11 +427,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
+                            horizontal: 12,
                             vertical: 8,
                           ),
                         ),
                         value: _stockStatusFilter,
+                        isExpanded: true, // Prevent overflow
                         items: [
                           const DropdownMenuItem<String?>(
                             value: null,
@@ -437,40 +454,42 @@ class _ProductListScreenState extends State<ProductListScreen> {
                         onChanged: _handleStockStatusFilterChange,
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 12),
 
                     // Sort by dropdown
                     Expanded(
-                    child: DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                    labelText: 'Sort By',
-                    border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                    ),
-                    ),
-                    value: _sortBy,
-                    items: const [
-                    DropdownMenuItem<String>(
-                    value: 'created_at',
-                    child: Text('Newest'),
-                    ),
-                    DropdownMenuItem<String>(
-                    value: 'name',
-                    child: Text('Name'),
-                    ),
-                    DropdownMenuItem<String>(
-                    value: 'price',
-                    child: Text('Price'),
-                    ),
-                    DropdownMenuItem<String>(
-                    value: 'stock',
-                    child: Text('Stock'),
-                    ),
-                    ],
+                      flex: 1,
+                      child: DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          labelText: 'Sort By',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                        ),
+                        value: _sortBy,
+                        isExpanded: true, // Prevent overflow
+                        items: const [
+                          DropdownMenuItem<String>(
+                            value: 'created_at',
+                            child: Text('Newest'),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: 'name',
+                            child: Text('Name'),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: 'price',
+                            child: Text('Price'),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: 'stock',
+                            child: Text('Stock'),
+                          ),
+                        ],
                         onChanged: (value) {
                           if (value != null) {
                             _handleSortChange(value);
@@ -621,74 +640,84 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0,
-                                    vertical: 8.0,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      // SKU and price
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'SKU: ${product.sku}',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey.shade600,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            'Price: $_currencySymbol${product.price.toStringAsFixed(2)}',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.primaryColor,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-
-                                      // Stock
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                Icons.inventory,
-                                                size: 16,
-                                                color: stockStatusColor,
-                                              ),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                'Stock: ${product.stock}',
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: stockStatusColor,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            'Min: ${product.minStock}',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey.shade600,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
+                                padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0,
+                                vertical: 8.0,
                                 ),
+                                child: Row(
+                                children: [
+                                // SKU and price
+                                  Expanded(
+                                  flex: 2,
+                                  child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                    Text(
+                                    'SKU: ${product.sku}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                                  overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                  'Price: $_currencySymbol${product.price.toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryColor,
+                                  ),
+                                    overflow: TextOverflow.ellipsis,
+                                    ),
+                                    ],
+                          ),
+                                ),
+                                const SizedBox(width: 8),
+
+                                // Stock
+                                Expanded(
+                                flex: 1,
+                                child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.inventory,
+                                  size: 16,
+                                  color: stockStatusColor,
+                                ),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                      'Stock: ${product.stock}',
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: stockStatusColor,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  ],
+                                  ),
+                                    const SizedBox(height: 4),
+                                      Text(
+                                          'Min: ${product.minStock}',
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
                                 ButtonBar(
                                   alignment: MainAxisAlignment.spaceEvenly,

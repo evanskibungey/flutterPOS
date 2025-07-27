@@ -862,354 +862,353 @@ class _AdminDashboardState extends State<AdminDashboard>
             );
           },
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Welcome card
-              Card(
-                elevation: 0,
-                color: theme.colorScheme.primary,
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.emoji_emotions,
-                            color: Colors.white.withOpacity(0.9),
-                            size: 28,
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'Welcome back!',
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Here\'s what\'s happening with your business today.',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: Colors.white.withOpacity(0.9),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          OutlinedButton.icon(
-                            onPressed: () {
-                              _navigateTo(POSSalesScreen());
-                            },
-                            icon: const Icon(Icons.point_of_sale, size: 18),
-                            label: const Text('New Sale'),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              side: const BorderSide(color: Colors.white),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          OutlinedButton.icon(
-                            onPressed: () {
-                              _navigateTo(const InventoryReportScreen());
-                            },
-                            icon: const Icon(
-                              Icons.inventory_2_outlined,
-                              size: 18,
-                            ),
-                            label: const Text('Inventory'),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              side: const BorderSide(color: Colors.white),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
+          children: [
+          // Welcome card
+          Card(
+          elevation: 0,
+          color: theme.colorScheme.primary,
+          child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          Row(
+          children: [
+          Icon(
+          Icons.emoji_emotions,
+          color: Colors.white.withOpacity(0.9),
+          size: 28,
+          ),
+          const SizedBox(width: 12),
+          Text(
+          'Welcome back!',
+          style: theme.textTheme.titleLarge?.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          ),
+          ),
+          ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+          'Here\'s what\'s happening with your business today.',
+          style: theme.textTheme.bodyLarge?.copyWith(
+          color: Colors.white.withOpacity(0.9),
+          ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+          children: [
+          OutlinedButton.icon(
+          onPressed: () {
+          _navigateTo(POSSalesScreen());
+          },
+          icon: const Icon(Icons.point_of_sale, size: 18),
+          label: const Text('New Sale'),
+          style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.white,
+          side: const BorderSide(color: Colors.white),
+          padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+          ),
+          ),
+          ),
+          const SizedBox(width: 12),
+          OutlinedButton.icon(
+          onPressed: () {
+          _navigateTo(const InventoryReportScreen());
+          },
+          icon: const Icon(
+          Icons.inventory_2_outlined,
+          size: 18,
+          ),
+          label: const Text('Inventory'),
+          style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.white,
+          side: const BorderSide(color: Colors.white),
+          padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+          ),
+          ),
+          ),
+          ],
+          ),
+          ],
+          ),
+          ),
+          ),
+          const SizedBox(height: 24),
 
-              // Sales Overview
-              Text(
-                'Sales Overview',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildSalesOverview(currencySymbol: currencySymbol),
-              const SizedBox(height: 24),
+          // Sales Overview
+          Text(
+          'Sales Overview',
+          style: theme.textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.primary,
+          ),
+          ),
+          const SizedBox(height: 16),
+          _buildSalesOverview(currencySymbol: currencySymbol),
+          const SizedBox(height: 24),
 
-              // Business Stats
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Business Stats',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                  TextButton.icon(
-                    onPressed: _loadDashboardData,
-                    icon: const Icon(Icons.refresh, size: 18),
-                    label: const Text('Refresh'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: theme.colorScheme.secondary,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _buildStatsOverview(currencySymbol: currencySymbol),
-              const SizedBox(height: 24),
+          // Business Stats
+          Row(
+          children: [
+          Expanded(
+          child: Text(
+          'Business Stats',
+          style: theme.textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.primary,
+          ),
+          ),
+          ),
+          TextButton.icon(
+          onPressed: _loadDashboardData,
+          icon: const Icon(Icons.refresh, size: 18),
+          label: const Text('Refresh'),
+          style: TextButton.styleFrom(
+          foregroundColor: theme.colorScheme.secondary,
+          ),
+          ),
+          ],
+          ),
+          const SizedBox(height: 16),
+          _buildStatsOverview(currencySymbol: currencySymbol),
+          const SizedBox(height: 24),
 
-              // Sales Trend Chart
-              Card(
-                elevation: 3,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.trending_up,
-                            color: theme.colorScheme.secondary,
-                            size: 24,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Sales Trend',
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const Spacer(),
-                          DropdownButton<String>(
-                            value: 'This Month',
-                            items:
-                                [
-                                  'This Week',
-                                  'This Month',
-                                  'This Quarter',
-                                  'This Year',
-                                ].map((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                            onChanged: (newValue) {
-                              // Update chart period
-                            },
-                            style: theme.textTheme.bodyMedium,
-                            underline: Container(),
-                            icon: const Icon(Icons.keyboard_arrow_down),
-                          ),
-                        ],
-                      ),
-                      const Divider(),
-                      const SizedBox(height: 16),
-                      _buildSalesTrendChart(currencySymbol: currencySymbol),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
+          // Sales Trend Chart
+          Card(
+          elevation: 3,
+          child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          Row(
+          children: [
+          Icon(
+          Icons.trending_up,
+          color: theme.colorScheme.secondary,
+          size: 24,
+          ),
+          const SizedBox(width: 8),
+          Text(
+          'Sales Trend',
+          style: theme.textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.w600,
+          ),
+          ),
+          const Spacer(),
+          DropdownButton<String>(
+          value: 'This Month',
+          items:
+          [
+          'This Week',
+          'This Month',
+          'This Quarter',
+          'This Year',
+          ].map((String value) {
+          return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+          );
+          }).toList(),
+          onChanged: (newValue) {
+          // Update chart period
+          },
+          style: theme.textTheme.bodyMedium,
+          underline: Container(),
+          icon: const Icon(Icons.keyboard_arrow_down),
+          ),
+          ],
+          ),
+          const Divider(),
+          const SizedBox(height: 16),
+          _buildSalesTrendChart(currencySymbol: currencySymbol),
+          ],
+          ),
+          ),
+          ),
+          const SizedBox(height: 24),
 
-              // Two column layout for top products and payment methods on wider screens
-              if (isWideScreen)
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Top Selling Products',
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          _buildTopProductsList(currencySymbol: currencySymbol),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      flex: 2,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Payment Methods',
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          _buildPaymentMethodsChart(
-                            currencySymbol: currencySymbol,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                )
-              else
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Top Products
-                    Text(
-                      'Top Selling Products',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildTopProductsList(currencySymbol: currencySymbol),
-                    const SizedBox(height: 24),
+          // Two column layout for top products and payment methods on wider screens
+          if (isWideScreen)
+          Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          Expanded(
+          flex: 3,
+          child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          Text(
+          'Top Selling Products',
+          style: theme.textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.primary,
+          ),
+          ),
+          const SizedBox(height: 16),
+          _buildTopProductsList(currencySymbol: currencySymbol),
+          ],
+          ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+          flex: 2,
+          child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          Text(
+          'Payment Methods',
+          style: theme.textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.primary,
+          ),
+          ),
+          const SizedBox(height: 16),
+          _buildPaymentMethodsChart(
+          currencySymbol: currencySymbol,
+          ),
+          ],
+          ),
+          ),
+          ],
+          )
+          else
+          Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          // Top Products
+          Text(
+          'Top Selling Products',
+          style: theme.textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.primary,
+          ),
+          ),
+          const SizedBox(height: 16),
+          _buildTopProductsList(currencySymbol: currencySymbol),
+          const SizedBox(height: 24),
 
-                    // Payment Methods
-                    Text(
-                      'Payment Methods',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildPaymentMethodsChart(currencySymbol: currencySymbol),
-                  ],
-                ),
-              const SizedBox(height: 24),
+          // Payment Methods
+          Text(
+          'Payment Methods',
+          style: theme.textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.primary,
+          ),
+          ),
+          const SizedBox(height: 16),
+          _buildPaymentMethodsChart(currencySymbol: currencySymbol),
+          ],
+          ),
+          const SizedBox(height: 24),
 
-              // Recent Sales
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Recent Sales',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                  TextButton.icon(
-                    onPressed: () {
-                      _navigateTo(const SalesHistoryScreen());
-                    },
-                    icon: const Icon(Icons.history, size: 18),
-                    label: const Text('View All'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: theme.colorScheme.secondary,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _buildRecentSalesList(currencySymbol: currencySymbol),
-              const SizedBox(height: 24),
+          // Recent Sales
+          Row(
+          children: [
+          Expanded(
+          child: Text(
+          'Recent Sales',
+          style: theme.textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.primary,
+          ),
+          ),
+          ),
+          TextButton.icon(
+          onPressed: () {
+          _navigateTo(const SalesHistoryScreen());
+          },
+          icon: const Icon(Icons.history, size: 18),
+          label: const Text('View All'),
+          style: TextButton.styleFrom(
+          foregroundColor: theme.colorScheme.secondary,
+          ),
+          ),
+          ],
+          ),
+          const SizedBox(height: 16),
+          _buildRecentSalesList(currencySymbol: currencySymbol),
+          const SizedBox(height: 24),
 
-              // Reports Section (NEW)
-              Text(
-                'Reports',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const ReportsDashboardWidget(),
-              const SizedBox(height: 24),
+          // Reports Section (NEW)
+          Text(
+          'Reports',
+          style: theme.textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.primary,
+          ),
+          ),
+          const SizedBox(height: 16),
+          const ReportsDashboardWidget(),
+          const SizedBox(height: 24),
 
-              // Low Stock Products Alert
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.error.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: theme.colorScheme.error.withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.warning_amber_rounded,
-                          color: theme.colorScheme.error,
-                          size: 24,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Low Stock Alert',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.error,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    _buildLowStockProductsList(),
-                    if (_dashboardData.lowStockProducts.isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            _navigateTo(
-                              LowStockScreen(currencySymbol: currencySymbol),
-                            );
-                          },
-                          icon: const Icon(
-                            Icons.inventory_2_outlined,
-                            size: 18,
-                          ),
-                          label: const Text('Manage Inventory'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.colorScheme.error,
-                            foregroundColor: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-            ],
+          // Low Stock Products Alert
+          Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+          color: theme.colorScheme.error.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+          color: theme.colorScheme.error.withOpacity(0.3),
+          width: 1,
+          ),
+          ),
+          child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          Row(
+          children: [
+          Icon(
+          Icons.warning_amber_rounded,
+          color: theme.colorScheme.error,
+          size: 24,
+          ),
+          const SizedBox(width: 8),
+          Text(
+          'Low Stock Alert',
+          style: theme.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.error,
+          ),
+          ),
+          ],
+          ),
+          const SizedBox(height: 16),
+          _buildLowStockProductsList(),
+          if (_dashboardData.lowStockProducts.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          Align(
+          alignment: Alignment.centerRight,
+          child: ElevatedButton.icon(
+          onPressed: () {
+          _navigateTo(
+          LowStockScreen(currencySymbol: currencySymbol),
+          );
+          },
+          icon: const Icon(
+          Icons.inventory_2_outlined,
+          size: 18,
+          ),
+          label: const Text('Manage Inventory'),
+          style: ElevatedButton.styleFrom(
+          backgroundColor: theme.colorScheme.error,
+          foregroundColor: Colors.white,
+          ),
+          ),
+          ),
+          ],
+          ],
+          ),
+          ),
+          const SizedBox(height: 24),
+          ],
           ),
         ),
       ),
@@ -1932,9 +1931,11 @@ class _AdminDashboardState extends State<AdminDashboard>
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
+        constraints: const BoxConstraints(maxHeight: 500), // Add height constraint
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min, // Important: use minimum space needed
           children: [
             Text(
               'Payment Method Distribution',
@@ -1969,7 +1970,13 @@ class _AdminDashboardState extends State<AdminDashboard>
             const SizedBox(height: 20),
             const Divider(),
             const SizedBox(height: 8),
-            Column(children: legendItems),
+            // Wrap the legend in a constrained container to prevent overflow
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 200),
+              child: SingleChildScrollView(
+                child: Column(children: legendItems),
+              ),
+            ),
           ],
         ),
       ),
@@ -2021,10 +2028,12 @@ class _AdminDashboardState extends State<AdminDashboard>
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
+      child: Container(
+        constraints: const BoxConstraints(maxHeight: 600), // Add height constraint
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min, // Use minimum space needed
           children: [
             // Header row with "View All" link
             Row(
@@ -2095,11 +2104,13 @@ class _AdminDashboardState extends State<AdminDashboard>
             const Divider(),
 
             // Table body
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: topProducts.length,
-              itemBuilder: (context, index) {
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 400),
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: topProducts.length,
+                itemBuilder: (context, index) {
                 final product = topProducts[index];
 
                 return Column(
@@ -2186,7 +2197,7 @@ class _AdminDashboardState extends State<AdminDashboard>
                 );
               },
             ),
-          ],
+          ),]
         ),
       ),
     );
@@ -2315,17 +2326,21 @@ class _AdminDashboardState extends State<AdminDashboard>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    sale.customerName.isEmpty
-                                        ? 'Walk-in Customer'
-                                        : sale.customerName,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      sale.customerName.isEmpty
+                                          ? 'Walk-in Customer'
+                                          : sale.customerName,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
                                     ),
                                   ),
+                                  const SizedBox(width: 8),
                                   Text(
                                     _formatAmount(
                                       sale.totalAmount,
@@ -2340,16 +2355,19 @@ class _AdminDashboardState extends State<AdminDashboard>
                               ),
                               const SizedBox(height: 4),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    'Receipt #${sale.receiptNumber}',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: theme.colorScheme.primary,
+                                  Expanded(
+                                    child: Text(
+                                      'Receipt #${sale.receiptNumber}',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
                                     ),
                                   ),
+                                  const SizedBox(width: 8),
                                   Text(
                                     sale.createdAt,
                                     style: TextStyle(

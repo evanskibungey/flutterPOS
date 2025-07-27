@@ -2,7 +2,10 @@ import 'package:flutter/foundation.dart';
 
 class ApiConfig {
   // Base URL - Production endpoint
-  static const String baseUrl = 'https://sales.eldogas.co.ke';
+  static const String baseUrl = 'https://eldogas.co.ke';
+  
+  // Ensure all API calls use the correct path
+  static const String apiPath = '/api';
   
   // Auth endpoints
   static const String loginEndpoint = '/api/login';
@@ -71,6 +74,10 @@ static const String recordPaymentEndpoint = '/api/credits/'; // Add customer ID 
   
   // Get full URL for endpoints
   static String getEndpointUrl(String endpoint) {
+    // Ensure endpoint starts with /api if it doesn't already
+    if (!endpoint.startsWith('/api/')) {
+      endpoint = '/api' + (endpoint.startsWith('/') ? endpoint : '/' + endpoint);
+    }
     return baseUrl + endpoint;
   }
   

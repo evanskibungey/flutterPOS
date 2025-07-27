@@ -5,8 +5,8 @@ class User {
   final String role;
   final String status;
   final String? emailVerifiedAt;
-  final String createdAt;
-  final String updatedAt;
+  final String? createdAt;
+  final String? updatedAt;
 
   User({
     required this.id,
@@ -15,8 +15,8 @@ class User {
     required this.role,
     required this.status,
     this.emailVerifiedAt,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -27,8 +27,8 @@ class User {
       role: json['role'],
       status: json['status'],
       emailVerifiedAt: json['email_verified_at'],
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
     );
   }
 
