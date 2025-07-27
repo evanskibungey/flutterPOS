@@ -538,20 +538,24 @@ class _POSSalesScreenState extends State<POSSalesScreen> with SingleTickerProvid
                           // Price and add button with better alignment
                           Row(
                             children: [
-                              // Price with larger text
-                              Text(
-                                '${_currencySymbol} ${product.price.toStringAsFixed(2)}',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                  color: AppColors.primaryColor,
+                              // Price with larger text - wrapped in Expanded to prevent overflow
+                              Expanded(
+                                child: Text(
+                                  '${_currencySymbol} ${product.price.toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16, // Reduced from 18 to prevent overflow
+                                    color: AppColors.primaryColor,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
                                 ),
                               ),
-                              Spacer(),
+                              const SizedBox(width: 8), // Fixed spacing instead of Spacer
                               // Enhanced add to cart button
                               SizedBox(
-                                height: 36,
-                                width: 36,
+                                height: 32, // Reduced from 36 to save space
+                                width: 32,  // Reduced from 36 to save space
                                 child: ElevatedButton(
                                   onPressed: isOutOfStock
                                       ? null
@@ -567,7 +571,7 @@ class _POSSalesScreenState extends State<POSSalesScreen> with SingleTickerProvid
                                   ),
                                   child: Icon(
                                     Icons.add_shopping_cart,
-                                    size: 18,
+                                    size: 16, // Reduced from 18 to fit smaller button
                                   ),
                                 ),
                               ),

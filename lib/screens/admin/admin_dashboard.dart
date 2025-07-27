@@ -177,15 +177,25 @@ class _AdminDashboardState extends State<AdminDashboard>
                 child: Icon(Icons.store, color: Color(0xFFEEEEEE), size: 20),
               ),
               const SizedBox(width: 12),
-              Text(
-                _dashboardData.settings['company_name'] ?? 'Company',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
+              Expanded(
+                child: Text(
+                  _dashboardData.settings['company_name'] ?? 'Company',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
               ),
             ] else ...[
-              Text('Admin Dashboard'),
+              Expanded(
+                child: Text(
+                  'Admin Dashboard',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
             ],
           ],
         ),
