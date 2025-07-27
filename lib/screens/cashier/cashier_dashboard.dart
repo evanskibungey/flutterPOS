@@ -528,9 +528,9 @@ class _CashierDashboardState extends State<CashierDashboard> {
             Icon(
               Icons.warning_amber_rounded,
               color: AppColors.errorColor,
-              size: 32,
+              size: 28, // Reduced from 32 to save space
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12), // Reduced from 16 to save space
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -538,36 +538,44 @@ class _CashierDashboardState extends State<CashierDashboard> {
                   Text(
                     'Low Stock Alert',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 15, // Reduced from 16 to save space
                       fontWeight: FontWeight.bold,
                       color: AppColors.errorColor,
                     ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                   Text(
                     '${_dashboardData!.lowStockCount} products are running low on stock',
                     style: TextStyle(
+                      fontSize: 13, // Slightly reduced font size
                       color: AppColors.errorColor.withOpacity(0.8),
                     ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                   ),
                 ],
               ),
             ),
-            TextButton(
-              onPressed: () {
+            const SizedBox(width: 8), // Added small spacing
+            InkWell(
+              onTap: () {
                 // Navigate to low stock page
               },
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.errorColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  side: BorderSide(color: AppColors.errorColor),
+              borderRadius: BorderRadius.circular(6),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), // Reduced padding
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: AppColors.errorColor, width: 1),
                 ),
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              ),
-              child: Text(
-                'View',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
+                child: Text(
+                  'View',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12, // Reduced font size
+                    color: AppColors.errorColor,
+                  ),
                 ),
               ),
             ),
